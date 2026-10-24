@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { supabaseAdmin, NOT_CONFIGURED } from "@/lib/supabaseAdmin";
 import { allow } from "@/lib/rateLimit";
 import { isExpired } from "@/lib/invites";
 
 export async function POST(req) {
   try {
-    const { slug, name, email, attending, message, company } = await req.json();
+    const { slug, name, email, attending, message, faxOnly } = await req.json();
 
     // honeypot: pretend it worked so bots don't retry
-    if (company) return NextResponse.json({ ok: true });
+    if (faxOnly) return NextResponse.json({ ok: true });
 
     if (!slug || !name?.trim()) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -44,6 +44,7 @@ export async function POST(req) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error(e);
+    if (e.name === "ConfigError") return NextResponse.json({ error: NOT_CONFIGURED }, { status: 503 });
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
 }

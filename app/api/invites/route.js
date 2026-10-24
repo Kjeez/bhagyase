@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { supabaseAdmin, NOT_CONFIGURED } from "@/lib/supabaseAdmin";
 import { mergeData, slugify } from "@/lib/defaults";
 import { allow } from "@/lib/rateLimit";
 import { getUser } from "@/lib/supabase/server";
@@ -9,7 +9,7 @@ export async function POST(req) {
     const body = await req.json();
 
     // honeypot: humans never see this field
-    if (body.company) return NextResponse.json({ error: "Bad request" }, { status: 400 });
+    if (body.faxOnly) return NextResponse.json({ error: "Bad request" }, { status: 400 });
 
     if (!(await allow("create", req, 10, 3600))) {
       return NextResponse.json({ error: "Too many invitations from this network — try again in an hour." }, { status: 429 });
@@ -45,6 +45,7 @@ export async function POST(req) {
     return NextResponse.json({ error: "Could not create invitation" }, { status: 500 });
   } catch (e) {
     console.error(e);
+    if (e.name === "ConfigError") return NextResponse.json({ error: NOT_CONFIGURED }, { status: 503 });
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
 }

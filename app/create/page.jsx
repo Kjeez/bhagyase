@@ -11,7 +11,7 @@ export default function CreatePage() {
   const router = useRouter();
   const { user, ready } = useUser();
   const [data, setData] = useState(DEFAULT_DATA);
-  const [company, setCompany] = useState(""); // honeypot
+  const [faxOnly, setFaxOnly] = useState(""); // honeypot
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
 
@@ -26,7 +26,7 @@ export default function CreatePage() {
       const res = await fetch("/api/invites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data, company }),
+        body: JSON.stringify({ data, faxOnly }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Something went wrong");
@@ -56,8 +56,8 @@ export default function CreatePage() {
       )}
 
       <InviteForm data={data} setData={setData} />
-      <input className="hp" tabIndex={-1} autoComplete="off" aria-hidden="true" name="company"
-        value={company} onChange={(e) => setCompany(e.target.value)} />
+      <input className="hp" tabIndex={-1} autoComplete="off" aria-hidden="true" name="contact_by_fax_only"
+        value={faxOnly} onChange={(e) => setFaxOnly(e.target.value)} />
 
       <div className="ed-actions">
         <button className="btn" onClick={create} disabled={saving}>

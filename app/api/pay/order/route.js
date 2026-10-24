@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { supabaseAdmin, NOT_CONFIGURED } from "@/lib/supabaseAdmin";
 import { inviteByToken } from "@/lib/invites";
 import { PLANS, amountDue } from "@/lib/plans";
 import { publishInvite } from "@/lib/publish";
@@ -56,6 +56,7 @@ export async function POST(req) {
     });
   } catch (e) {
     console.error(e);
+    if (e.name === "ConfigError") return NextResponse.json({ error: NOT_CONFIGURED }, { status: 503 });
     return NextResponse.json({ error: "Could not start payment" }, { status: 500 });
   }
 }
