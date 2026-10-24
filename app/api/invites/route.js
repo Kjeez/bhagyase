@@ -1,16 +1,26 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { mergeData, slugify } from "@/lib/defaults";
+import { allow } from "@/lib/rateLimit";
+import { getUser } from "@/lib/supabase/server";
 
 export async function POST(req) {
   try {
     const body = await req.json();
-    const data = mergeData(body.data || {});
 
+    // honeypot: humans never see this field
+    if (body.company) return NextResponse.json({ error: "Bad request" }, { status: 400 });
+
+    if (!(await allow("create", req, 10, 3600))) {
+      return NextResponse.json({ error: "Too many invitations from this network — try again in an hour." }, { status: 429 });
+    }
+
+    const data = mergeData(body.data || {});
     if (!data.groom?.trim() || !data.bride?.trim()) {
       return NextResponse.json({ error: "Groom and bride names are required" }, { status: 400 });
     }
 
+    const user = await getUser();
     const db = supabaseAdmin();
     let slug = slugify(data.groom, data.bride);
 
@@ -18,7 +28,7 @@ export async function POST(req) {
     for (let attempt = 0; attempt < 2; attempt++) {
       const { data: row, error } = await db
         .from("invites")
-        .insert({ slug, template: "emerald-noir", data })
+        .insert({ slug, template: "emerald-noir", data, owner_id: user?.id || null })
         .select("slug, edit_token")
         .single();
 

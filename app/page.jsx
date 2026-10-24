@@ -1,4 +1,7 @@
 import Link from "next/link";
+import NavAuth from "@/components/NavAuth";
+import { PLANS, PLAN_ORDER } from "@/lib/plans";
+import { CONTACT } from "@/lib/site";
 import {
   MessageCircleHeart, Timer, MapPin, Music, Sparkles, Pencil, Share2, Inbox,
 } from "lucide-react";
@@ -14,7 +17,10 @@ export default function Landing() {
     <>
       <nav className="ld-nav">
         <Link href="/" className="ld-logo"><b>WebAlchemy</b> Invites</Link>
-        <Link href="/create" className="btn">Create my invitation</Link>
+        <div className="ld-nav-r">
+          <NavAuth />
+          <Link href="/create" className="btn"><span className="hide-sm">Create my invitation</span><span className="show-sm">Create</span></Link>
+        </div>
       </nav>
 
       <section className="ld-hero">
@@ -29,10 +35,10 @@ export default function Landing() {
           </p>
           <div className="ld-cta-row">
             <Link href="/create" className="btn">Create my invitation →</Link>
-            <Link href="/create" className="btn ghost">See it live</Link>
+            <Link href="/invite/demo" className="btn ghost">See a live invite</Link>
           </div>
           <p className="ld-trust">
-            One-time payment · <b>No subscription</b> · Unique link like <b>yoursite.com/invite/aarav-weds-meher</b>
+            Free to create &amp; preview · <b>One-time payment</b> · No subscription
           </p>
         </div>
 
@@ -74,29 +80,42 @@ export default function Landing() {
         <h2>Three steps. Five minutes.</h2>
         <div className="steps">
           <div className="step"><span className="n">01</span><h3>Fill your details</h3><p>Names, date, venue, events — a simple form designed for your phone.</p></div>
-          <div className="step"><span className="n">02</span><h3>Get your link</h3><p>A unique invitation link plus a private edit link only you hold.</p></div>
+          <div className="step"><span className="n">02</span><h3>Preview &amp; publish</h3><p>Preview it free. Pay once to go live and get your unique invitation link — saved in your account or a private edit link.</p></div>
           <div className="step"><span className="n">03</span><h3>Share &amp; track</h3><p>Send on WhatsApp, then watch RSVPs and wishes arrive in your inbox.</p></div>
         </div>
       </section>
 
-      <section className="ld-price">
+      <section className="ld-price" id="pricing">
         <h2>Simple pricing</h2>
-        <div className="price-card">
-          <div className="amt">₹1,499</div>
-          <div className="per">one-time · no subscription · live till your wedding + 6 months</div>
-          <ul>
-            <li>Emerald Noir animated template</li>
-            <li>All sections — countdown, scratch card, timeline, maps</li>
-            <li>Unlimited edits from your phone</li>
-            <li>RSVP inbox &amp; guest wishes</li>
-            <li>WhatsApp-ready unique link</li>
-          </ul>
-          <Link href="/create" className="btn">Start free — pay when you publish</Link>
+        <p className="ld-price-sub">Create and preview for free. Pay once when you publish — no subscription.</p>
+        <div className="price-grid">
+          {PLAN_ORDER.map((id) => {
+            const p = PLANS[id];
+            return (
+              <div className={`price-card ${id === "plus" ? "hot" : ""}`} key={id}>
+                {id === "plus" && <span className="plan-badge">Most loved</span>}
+                <h3>{p.name}</h3>
+                <div className="amt">{p.price}</div>
+                <div className="per">one-time · live till your wedding + {p.monthsAfterWedding} months</div>
+                <ul>
+                  {p.features.map((f) => <li key={f}>{f}</li>)}
+                </ul>
+                <Link href="/create" className={`btn ${id === "plus" ? "" : "ghost"}`}>Start free — pay when you publish</Link>
+              </div>
+            );
+          })}
         </div>
       </section>
 
       <footer className="ld-foot">
-        WebAlchemy Invites · A WebAlchemy product · Delhi NCR, India
+        <p>WebAlchemy Invites · A {CONTACT.business} product · {CONTACT.city}</p>
+        <p className="ld-foot-links">
+          <a href={`https://wa.me/${CONTACT.whatsapp}`} target="_blank" rel="noreferrer">WhatsApp us</a>
+          <Link href="/contact">Contact</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/refund">Refunds</Link>
+        </p>
       </footer>
     </>
   );

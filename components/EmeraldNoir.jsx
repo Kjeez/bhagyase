@@ -197,7 +197,7 @@ function Slideshow({ photos }) {
 /* ------------------------------ main ------------------------------ */
 
 export default function EmeraldNoir({ data, slug, preview = false }) {
-  const [rsvp, setRsvp] = useState({ name: "", email: "", attending: "", msg: "" });
+  const [rsvp, setRsvp] = useState({ name: "", email: "", attending: "", msg: "", company: "" });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [musicOn, setMusicOn] = useState(false);
@@ -222,12 +222,12 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slug, name: rsvp.name, email: rsvp.email,
-          attending: rsvp.attending, message: rsvp.msg,
+          attending: rsvp.attending, message: rsvp.msg, company: rsvp.company,
         }),
       });
       if (res.ok) {
         setSent(true);
-        setRsvp({ name: "", email: "", attending: "", msg: "" });
+        setRsvp({ name: "", email: "", attending: "", msg: "", company: "" });
         setTimeout(() => setSent(false), 3000);
       }
     } finally {
@@ -427,6 +427,9 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
                   <option value="no">Regretfully can&apos;t</option>
                 </select>
               </label>
+              {/* honeypot — hidden from people, filled by bots */}
+              <input className="hp" tabIndex={-1} autoComplete="off" aria-hidden="true" value={rsvp.company}
+                onChange={(e) => setRsvp({ ...rsvp, company: e.target.value })} />
               <label>Your Message
                 <textarea rows={3} placeholder="Write your wishes…" value={rsvp.msg}
                   onChange={(e) => setRsvp({ ...rsvp, msg: e.target.value })} />
