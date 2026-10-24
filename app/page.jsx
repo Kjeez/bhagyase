@@ -234,11 +234,12 @@ export default function Landing() {
             <div className="sec-head reveal">
               <p className="eyebrow">अपना अंदाज़</p>
               <h2>Pick your style</h2>
-              <p>Two designs ready today — switch between them any time. More hand-crafted styles are on their way.</p>
+              <p>Three designs ready today — switch between them any time. More hand-crafted styles are on their way.</p>
             </div>
             <div className="tpl-grid">
               {[
                 ["marigold-mela", "t-mela", "Marigold Mela", "Ivory, marigold and rani pink — curtains, dancing family, the most festive one."],
+                ["royal-palace", "t-royal", "Royal Palace", "A wax-sealed envelope that opens onto a moonlit palace."],
                 ["emerald-noir", "t-noir", "Emerald Noir", "Black, gold and candlelight elegance."],
               ].map(([id, cls, name, d], i) => (
                 <Link key={id} href={`/invite/demo?style=${id}`} className="tpl-card reveal" style={{ transitionDelay: `${i * 80}ms` }}>
@@ -248,10 +249,9 @@ export default function Landing() {
                 </Link>
               ))}
               {[
-                ["t-sapphire", "Royal Sapphire", "Midnight blue and gold jharokhas."],
                 ["t-pastel", "Pastel Mehendi", "Sage, blush and delicate henna lines."],
               ].map(([cls, name, d], i) => (
-                <div key={cls} className="tpl-card soon reveal" style={{ transitionDelay: `${(i + 2) * 80}ms` }} aria-disabled="true">
+                <div key={cls} className="tpl-card soon reveal" style={{ transitionDelay: `${(i + 3) * 80}ms` }} aria-disabled="true">
                   <div className={`tpl-thumb ${cls}`}><span className="tpl-names">Aarav<br />&amp;<br />Meher</span></div>
                   <div className="tpl-meta"><b>{name}</b><span className="tag">Coming soon</span></div>
                   <p>{d}</p>

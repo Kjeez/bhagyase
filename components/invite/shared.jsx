@@ -161,7 +161,8 @@ export function useRsvp(slug, preview) {
   const setField = (k, v) => setRsvp((r) => ({ ...r, [k]: v }));
   const set = (k) => (e) => setField(k, e.target.value);
 
-  const submit = async () => {
+  // `over` lets a template send its own attending/message (e.g. chosen events).
+  const submit = async (over = {}) => {
     if (!rsvp.name.trim() || sending) return false;
     if (preview) {
       setSent(true);
@@ -175,7 +176,7 @@ export function useRsvp(slug, preview) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slug, name: rsvp.name, email: rsvp.email,
-          attending: rsvp.attending, message: rsvp.msg, faxOnly: rsvp.faxOnly,
+          attending: over.attending ?? rsvp.attending, message: over.message ?? rsvp.msg, faxOnly: rsvp.faxOnly,
         }),
       });
       if (!res.ok) return false;

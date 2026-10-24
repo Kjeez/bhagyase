@@ -234,6 +234,7 @@ body:has(.lx) { background: #FFF8EC; }
 .tpl-names { font-family: var(--f-script), cursive; font-size: 34px; line-height: 1.05; }
 .t-noir { background: radial-gradient(circle at 50% 10%, #1d2a22, #0e100f 70%); color: #e9c96a; }
 .t-mela { background: radial-gradient(circle at 50% 0%, #FFE1A8, #FFF8EC 60%), #FFF8EC; color: #C8102E; box-shadow: 5px 5px 0 var(--ink), inset 0 10px 0 #F5A524; }
+.t-royal { background: linear-gradient(rgba(26,4,12,.35), rgba(26,4,12,.75)), url("/templates/royal/palace-night.jpg") center / cover; color: #f0cfa2; }
 .t-sapphire { background: radial-gradient(circle at 50% 10%, #1e3a7a, #0c1838 70%); color: #E9C96A; }
 .t-pastel { background: linear-gradient(160deg, #E6EFDF, #F9DDE3); color: #4E7D3A; }
 .tpl-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 16px; }

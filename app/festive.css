@@ -89,6 +89,12 @@ body:has(.fx) { background: #FFF8EC; }
 .fx .lp.marigold-mela .ph-cd span i { color: var(--ink-soft); }
 .fx .lp.marigold-mela .lp-fns span { color: var(--sindoor); border-color: #C8102E55; background: #fff; }
 
+/* Royal Palace look for the live preview phone */
+.fx .lp.royal-palace .phone-screen { background: linear-gradient(rgba(26,4,12,.55), rgba(26,4,12,.85)), url("/templates/royal/palace-night.jpg") center / cover; }
+.fx .lp.royal-palace .ph-name { font-family: var(--f-script), cursive; letter-spacing: 0; font-size: 36px; color: #f0cfa2; }
+.fx .lp.royal-palace .ph-eyebrow, .fx .lp.royal-palace .ph-amp, .fx .lp.royal-palace .ph-line { color: #f3e4e0; }
+.fx .lp.royal-palace .ph-cd span { background: #5b0b1fcc; border-color: #f0cfa255; }
+
 /* ---------- form ---------- */
 .fx .wf { gap: 20px; }
 .wf-card {
@@ -118,7 +124,7 @@ body:has(.fx) { background: #FFF8EC; }
 .fx .wf-toggle.on { background: var(--haldi); color: var(--ink); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
 
 /* style picker */
-.wf-styles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.wf-styles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
 .wf-style { display: flex; flex-direction: column; gap: 8px; }
 .wf-style button {
   text-align: left; display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 18px; cursor: pointer;

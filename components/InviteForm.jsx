@@ -80,6 +80,10 @@ export default function InviteForm({ data, setData }) {
           <F label="Bride extra line 1"><input value={data.brideLine1} onChange={(e) => up("brideLine1", e.target.value)} placeholder="(optional)" /></F>
           <F label="Bride extra line 2"><input value={data.brideLine2} onChange={(e) => up("brideLine2", e.target.value)} placeholder="(optional)" /></F>
         </div>
+        <F label="Your story (optional — shown in Royal Palace)">
+          <textarea rows={3} value={data.story} onChange={(e) => up("story", e.target.value)}
+            placeholder="How you met, your first trip, the proposal… Leave a blank line between paragraphs." />
+        </F>
       </Card>
 
       <Card icon={CalendarHeart} title="The big day" hint="Your countdown and scratch card use this date." acc="#FFD54A">
