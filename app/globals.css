@@ -38,31 +38,11 @@ button { font-family: inherit; }
 }
 .btn:focus-visible { outline: 2px solid var(--gold-2); outline-offset: 2px; }
 
-/* ---------- landing ---------- */
-.ld-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  max-width: 1080px; margin: 0 auto; padding: 20px 24px;
-}
+/* ---------- brand (used by app pages) ---------- */
 .ld-logo { font-family: "Cinzel", serif; font-size: 19px; letter-spacing: 2px; color: var(--ivory); text-decoration: none; }
 .ld-logo b { color: var(--gold); font-weight: 500; }
 
-.ld-hero {
-  max-width: 1080px; margin: 0 auto; padding: 60px 24px 80px;
-  display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 50px; align-items: center;
-}
-@media (max-width: 860px) { .ld-hero { grid-template-columns: 1fr; padding-top: 30px; } }
-
-.ld-hero h1 {
-  font-family: "Cinzel", serif; font-weight: 400;
-  font-size: clamp(34px, 5.4vw, 54px); line-height: 1.18; letter-spacing: 1px;
-}
-.ld-hero h1 em { font-style: normal; color: var(--gold); }
-.ld-hero .sub { margin: 22px 0 30px; font-size: 17px; line-height: 1.8; color: var(--muted); max-width: 480px; font-weight: 300; }
-.ld-cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
-.ld-trust { margin-top: 26px; font-size: 13.5px; color: var(--muted); letter-spacing: 0.5px; }
-.ld-trust b { color: var(--gold-2); font-weight: 500; }
-
-/* phone mockup */
+/* ---------- phone mockup (landing hero) ---------- */
 .phone {
   width: min(300px, 82vw); margin: 0 auto; border-radius: 44px;
   background: linear-gradient(180deg, #3a3f3c, #161917 70%);
@@ -92,37 +72,6 @@ button { font-family: inherit; }
   padding: 7px 8px; font-family: "Cinzel", serif; font-size: 14px; color: var(--ivory); min-width: 38px;
 }
 .ph-cd span i { display: block; font-style: normal; font-family: "Jost", sans-serif; font-size: 7px; letter-spacing: 1px; color: var(--muted); margin-top: 3px; text-transform: uppercase; }
-
-/* features */
-.ld-feats { max-width: 1080px; margin: 0 auto; padding: 20px 24px 70px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-@media (max-width: 860px) { .ld-feats { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .ld-feats { grid-template-columns: 1fr; } }
-.feat { border: 1px solid var(--gold-faint); background: var(--bg-2); border-radius: 12px; padding: 22px 20px; }
-.feat .ic { color: var(--gold); margin-bottom: 12px; }
-.feat h3 { font-size: 16px; font-weight: 500; letter-spacing: 0.5px; margin-bottom: 8px; }
-.feat p { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; }
-
-/* steps */
-.ld-steps { max-width: 780px; margin: 0 auto; padding: 0 24px 90px; text-align: center; }
-.ld-steps h2, .ld-price h2 { font-family: "Cinzel", serif; font-weight: 400; font-size: clamp(24px, 4vw, 32px); letter-spacing: 1px; margin-bottom: 40px; }
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: left; }
-@media (max-width: 640px) { .steps { grid-template-columns: 1fr; } }
-.step .n { font-family: "Cinzel", serif; font-size: 30px; color: var(--gold); }
-.step h3 { font-size: 16px; font-weight: 500; margin: 10px 0 8px; }
-.step p { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.7; }
-
-/* pricing */
-.ld-price { max-width: 780px; margin: 0 auto; padding: 0 24px 90px; text-align: center; }
-.price-card {
-  border: 1px solid var(--gold-dim); border-radius: 16px; background: var(--bg-2);
-  padding: 40px 30px; max-width: 420px; margin: 0 auto;
-}
-.price-card .amt { font-family: "Cinzel", serif; font-size: 44px; color: var(--gold-2); }
-.price-card .per { font-size: 14px; color: var(--muted); margin: 6px 0 20px; }
-.price-card ul { list-style: none; text-align: left; margin: 0 auto 26px; max-width: 300px; }
-.price-card li { font-size: 15px; font-weight: 300; color: var(--ivory); padding: 7px 0; border-bottom: 1px dashed var(--gold-faint); }
-
-.ld-foot { border-top: 1px solid var(--gold-faint); padding: 30px 24px 40px; text-align: center; font-size: 14px; color: var(--muted); font-weight: 300; }
 
 /* ---------- editor pages ---------- */
 .ed-page { max-width: 720px; margin: 0 auto; padding: 30px 20px 80px; }
@@ -190,19 +139,10 @@ button { font-family: inherit; }
 /* ---------- phase 1: accounts, publishing, legal ---------- */
 .hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
-.ld-nav-r { display: flex; align-items: center; gap: 18px; }
 .ld-navlink { color: var(--gold-2); text-decoration: none; font-size: 15px; letter-spacing: 0.5px; }
 .ld-navlink:hover { text-decoration: underline; }
 .as-btn { background: none; border: none; cursor: pointer; }
-@media (max-width: 520px) { .ld-nav .btn { padding: 11px 16px; font-size: 14px; } .ld-nav-r { gap: 12px; } }
 
-.ld-price-sub { color: var(--muted); font-weight: 300; margin: -24px 0 34px; }
-.price-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; align-items: stretch; }
-@media (max-width: 720px) { .price-grid { grid-template-columns: 1fr; } }
-.price-grid .price-card { max-width: none; margin: 0; position: relative; display: flex; flex-direction: column; }
-.price-grid .price-card ul { flex: 1; }
-.price-card h3 { font-family: "Cinzel", serif; font-weight: 400; font-size: 20px; letter-spacing: 1px; margin-bottom: 8px; }
-.price-card.hot { border-color: var(--gold); box-shadow: 0 20px 60px #d4af3722; }
 
 .plan-badge {
   position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
@@ -211,9 +151,6 @@ button { font-family: inherit; }
   padding: 5px 12px; border-radius: 20px; white-space: nowrap;
 }
 
-.ld-foot p + p { margin-top: 12px; }
-.ld-foot-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 20px; }
-.ld-foot-links a { color: var(--gold-2); text-decoration: none; }
 
 .ed-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
 .ed-page.narrow { max-width: 460px; }
@@ -276,10 +213,3 @@ button { font-family: inherit; }
 .legal b { font-weight: 500; }
 .legal-contact { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--gold-faint); }
 .ld-navlink { white-space: nowrap; }
-.show-sm { display: none; }
-@media (max-width: 520px) {
-  .hide-sm { display: none; }
-  .show-sm { display: inline; }
-  .ld-nav { padding: 16px; }
-  .ld-logo { font-size: 16px; letter-spacing: 1px; }
-}
