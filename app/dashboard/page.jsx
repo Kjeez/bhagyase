@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import FestiveShell from "@/components/FestiveShell";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { getUser } from "@/lib/supabase/server";
 import { isExpired } from "@/lib/invites";
@@ -36,47 +37,47 @@ export default async function Dashboard() {
   );
 
   return (
-    <div className="ed-page">
-      <div className="ed-top">
-        <Link href="/" className="ld-logo"><b>WebAlchemy</b> Invites</Link>
-        <form action="/auth/signout" method="post">
-          <button className="ld-navlink as-btn">Log out</button>
-        </form>
-      </div>
-
-      <h1 style={{ marginTop: 28 }}>My invitations</h1>
-      <p className="lead">Logged in as {user.email}</p>
-
-      {(invites || []).length === 0 ? (
-        <div className="inbox-empty">
-          No invitations yet. <Link href="/create">Create your first one →</Link>
-          <br />
-          <small>Made one as a guest? Open its private edit link while logged in and tap &ldquo;Save to my account&rdquo;.</small>
+    <FestiveShell>
+      <div className="ed-page">
+        <div className="ed-top">
+          <h1>My invitations</h1>
+          <form action="/auth/signout" method="post">
+            <button className="ld-navlink as-btn">Log out</button>
+          </form>
         </div>
-      ) : (
-        <div className="dash-list">
-          {invites.map((inv) => {
-            const s = statusOf(inv);
-            const d = inv.data || {};
-            return (
-              <Link href={`/edit/${inv.edit_token}`} className="dash-card" key={inv.id}>
-                <div>
-                  <div className="dash-names">{d.groom} &amp; {d.bride}</div>
-                  <div className="dash-meta">
-                    {d.dateISO ? new Date(d.dateISO).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "Date not set"}
-                    {" · "}{counts[inv.id]} RSVP{counts[inv.id] === 1 ? "" : "s"}
+        <p className="lead">Logged in as {user.email}</p>
+
+        {(invites || []).length === 0 ? (
+          <div className="inbox-empty">
+            No invitations yet. <Link href="/create">Create your first one →</Link>
+            <br />
+            <small>Made one as a guest? Open its private edit link while logged in and tap &ldquo;Save to my account&rdquo;.</small>
+          </div>
+        ) : (
+          <div className="dash-list">
+            {invites.map((inv) => {
+              const s = statusOf(inv);
+              const d = inv.data || {};
+              return (
+                <Link href={`/edit/${inv.edit_token}`} className="dash-card" key={inv.id}>
+                  <div>
+                    <div className="dash-names">{d.groom} &amp; {d.bride}</div>
+                    <div className="dash-meta">
+                      {d.dateISO ? new Date(d.dateISO).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "Date not set"}
+                      {" · "}{counts[inv.id]} RSVP{counts[inv.id] === 1 ? "" : "s"}
+                    </div>
                   </div>
-                </div>
-                <span className={`dash-tag ${s.cls}`}>{s.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+                  <span className={`dash-tag ${s.cls}`}>{s.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
 
-      <div className="ed-actions">
-        <Link href="/create" className="btn">+ New invitation</Link>
+        <div className="ed-actions">
+          <Link href="/create" className="btn">+ New invitation</Link>
+        </div>
       </div>
-    </div>
+    </FestiveShell>
   );
 }

@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/browser";
+import FestiveShell from "@/components/FestiveShell";
 
 // Only allow same-site relative paths as the post-login destination.
 function safeNext(next) {
@@ -79,13 +80,14 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="ed-page narrow">
-      <Link href="/" className="ld-logo"><b>WebAlchemy</b> Invites</Link>
-      <h1 style={{ marginTop: 28 }}>Log in</h1>
-      <p className="lead">Keep all your invitations and RSVPs in one place.</p>
-      <Suspense fallback={null}>
-        <LoginForm />
-      </Suspense>
-    </div>
+    <FestiveShell narrow>
+      <div className="ed-page">
+        <h1>Log in</h1>
+        <p className="lead">Keep all your invitations and RSVPs in one place.</p>
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
+      </div>
+    </FestiveShell>
   );
 }

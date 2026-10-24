@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
+import FestiveShell from "@/components/FestiveShell";
 import InviteForm from "@/components/InviteForm";
+import LivePreview from "@/components/LivePreview";
 import PublishPanel from "@/components/PublishPanel";
 import { mergeData } from "@/lib/defaults";
 import { PLANS } from "@/lib/plans";
@@ -90,8 +92,8 @@ export default function EditPage({ params }) {
     setMsg("Published! Share your link on WhatsApp 🎉");
   };
 
-  if (loading) return <div className="center-load">Loading your invitation…</div>;
-  if (err && !data) return <div className="center-load">{err}</div>;
+  if (loading) return <FestiveShell><div className="center-load">Loading your invitation…</div></FestiveShell>;
+  if (err && !data) return <FestiveShell><div className="center-load">{err}</div></FestiveShell>;
 
   const published = inv.status === "published";
   const rsvps = inv.rsvps;
@@ -107,120 +109,128 @@ export default function EditPage({ params }) {
   )}`;
 
   return (
-    <div className="ed-page">
-      <div className="ed-top">
-        <h1>{isNew ? "Your invitation is ready 🎉" : "Edit invitation"}</h1>
-        {inv.isOwner && <Link href="/dashboard" className="ld-navlink">← My invitations</Link>}
-      </div>
-      <p className="lead">
-        {published
-          ? "Changes go live on your invitation link the moment you save."
-          : "It's a private draft — preview it, polish it, and publish when you're happy."}
-      </p>
-
-      {/* status + publish */}
-      {published ? (
-        <div className="share-box">
-          <h2>Live · {PLANS[inv.plan]?.name || "Published"}</h2>
-          <div className="share-link">
-            <code>{inviteUrl}</code>
-            <CopyBtn text={inviteUrl} />
+    <FestiveShell>
+      <div className="fx-split">
+        <div className="ed-page">
+          <div className="ed-top">
+            <h1>{isNew ? "Your invitation is ready 🎉" : "Edit invitation"}</h1>
+            {inv.isOwner && <Link href="/dashboard" className="ld-navlink">← My invitations</Link>}
           </div>
-          <div className="share-link" style={{ marginTop: 12 }}>
-            <a className="btn" href={wa} target="_blank" rel="noreferrer">Share on WhatsApp</a>
-            <Link className="btn ghost" href={`/invite/${inv.slug}`} target="_blank">
-              Open invitation <ExternalLink size={14} />
-            </Link>
-          </div>
-          {inv.expiresAt && (
-            <p className="share-note">
-              Stays live until {new Date(inv.expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}.
-            </p>
-          )}
-          {inv.plan !== "plus" && (
-            <details className="upgrade">
-              <summary>Upgrade to Shaadi Plus</summary>
-              <PublishPanel token={token} currentPlan={inv.plan} onPublished={onPublished} />
-            </details>
-          )}
-        </div>
-      ) : (
-        <div className="share-box">
-          <h2>Draft · not live yet</h2>
-          <p className="share-note" style={{ marginTop: 0 }}>
-            Guests who open your link now see a &ldquo;coming soon&rdquo; card. Publish to switch it on.
-          </p>
-          <div className="share-link" style={{ margin: "14px 0 20px" }}>
-            <Link className="btn ghost" href={`/preview/${token}`} target="_blank">
-              <Eye size={15} /> Preview invitation
-            </Link>
-          </div>
-          <PublishPanel token={token} currentPlan={null} onPublished={onPublished} />
-        </div>
-      )}
-
-      {/* keep access safe */}
-      {!inv.isOwner && (
-        <div className="share-box">
-          <h2>Private edit link — save this</h2>
-          <div className="share-link">
-            <code>{editUrl}</code>
-            <CopyBtn text={editUrl} />
-          </div>
-          <div className="share-link" style={{ marginTop: 12 }}>
-            <a className="btn ghost" href={waSelf} target="_blank" rel="noreferrer">Send to my WhatsApp</a>
-            {inv.loggedIn && !inv.owned && <button className="btn" onClick={claim}>Save to my account</button>}
-            {!inv.loggedIn && (
-              <Link className="btn" href={`/login?next=${encodeURIComponent(`/edit/${token}`)}`}>Log in to keep it safe</Link>
-            )}
-          </div>
-          <p className="share-note">
-            Anyone with this link can edit the invitation and read your RSVP inbox — share it only with your partner.
-            {!inv.owned && " Logging in saves it to your account so you can never lose it."}
-          </p>
-        </div>
-      )}
-
-      <InviteForm data={data} setData={setData} />
-
-      <div className="ed-actions">
-        <button className="btn" onClick={save} disabled={saving}>
-          {saving ? <span className="spin" /> : null} {saving ? "Saving…" : "Save changes"}
-        </button>
-        <Link className="btn ghost" href={`/preview/${token}`} target="_blank"><Eye size={15} /> Preview</Link>
-      </div>
-      {msg && <p className="ed-msg">{msg}</p>}
-      {err && <p className="ed-err">{err}</p>}
-
-      <div className="inbox">
-        <h2>RSVP inbox</h2>
-        <p className="stats">
-          <b>{yes}</b> attending · <b>{no}</b> can&apos;t make it · <b>{rsvps.length}</b> total responses
-        </p>
-        {rsvps.length === 0 ? (
-          <div className="inbox-empty">
+          <p className="lead">
             {published
-              ? "No responses yet — share your link on WhatsApp and they'll appear here."
-              : "Publish your invitation and RSVPs will start arriving here."}
-          </div>
-        ) : (
-          rsvps.map((r, i) => (
-            <div className="rsvp-card" key={i}>
-              <div className="who">
-                <span className="nm">{r.name}</span>
-                {r.attending && (
-                  <span className={`tag ${r.attending === "yes" ? "yes" : "no"}`}>
-                    {r.attending === "yes" ? "Attending" : "Can't attend"}
-                  </span>
+              ? "Changes go live on your invitation link the moment you save."
+              : "It's a private draft — preview it, polish it, and publish when you're happy."}
+          </p>
+
+          {/* status + publish */}
+          {published ? (
+            <div className="share-box">
+              <h2>Live · {PLANS[inv.plan]?.name || "Published"}</h2>
+              <div className="share-link">
+                <code>{inviteUrl}</code>
+                <CopyBtn text={inviteUrl} />
+              </div>
+              <div className="share-link" style={{ marginTop: 12 }}>
+                <a className="btn" href={wa} target="_blank" rel="noreferrer">Share on WhatsApp</a>
+                <Link className="btn ghost" href={`/invite/${inv.slug}`} target="_blank">
+                  Open invitation <ExternalLink size={14} />
+                </Link>
+              </div>
+              {inv.expiresAt && (
+                <p className="share-note">
+                  Stays live until {new Date(inv.expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}.
+                </p>
+              )}
+              {inv.plan !== "plus" && (
+                <details className="upgrade">
+                  <summary>Upgrade to Shaadi Plus</summary>
+                  <PublishPanel token={token} currentPlan={inv.plan} onPublished={onPublished} />
+                </details>
+              )}
+            </div>
+          ) : (
+            <div className="share-box">
+              <h2>Draft · not live yet</h2>
+              <p className="share-note" style={{ marginTop: 0 }}>
+                Guests who open your link now see a &ldquo;coming soon&rdquo; card. Publish to switch it on.
+              </p>
+              <div className="share-link" style={{ margin: "14px 0 20px" }}>
+                <Link className="btn ghost" href={`/preview/${token}`} target="_blank">
+                  <Eye size={15} /> Preview invitation
+                </Link>
+              </div>
+              <PublishPanel token={token} currentPlan={null} onPublished={onPublished} />
+            </div>
+          )}
+
+          {/* keep access safe */}
+          {!inv.isOwner && (
+            <div className="share-box">
+              <h2>Private edit link — save this</h2>
+              <div className="share-link">
+                <code>{editUrl}</code>
+                <CopyBtn text={editUrl} />
+              </div>
+              <div className="share-link" style={{ marginTop: 12 }}>
+                <a className="btn ghost" href={waSelf} target="_blank" rel="noreferrer">Send to my WhatsApp</a>
+                {inv.loggedIn && !inv.owned && <button className="btn" onClick={claim}>Save to my account</button>}
+                {!inv.loggedIn && (
+                  <Link className="btn" href={`/login?next=${encodeURIComponent(`/edit/${token}`)}`}>Log in to keep it safe</Link>
                 )}
               </div>
-              {r.email && <div className="em">{r.email}</div>}
-              {r.message && <div className="ms">“{r.message}”</div>}
-              <div className="dt">{new Date(r.created_at).toLocaleString("en-IN")}</div>
+              <p className="share-note">
+                Anyone with this link can edit the invitation and read your RSVP inbox — share it only with your partner.
+                {!inv.owned && " Logging in saves it to your account so you can never lose it."}
+              </p>
             </div>
-          ))
-        )}
+          )}
+
+          <InviteForm data={data} setData={setData} />
+
+          <div className="ed-actions">
+            <button className="btn" onClick={save} disabled={saving}>
+              {saving ? <span className="spin" /> : null} {saving ? "Saving…" : "Save changes"}
+            </button>
+            <Link className="btn ghost" href={`/preview/${token}`} target="_blank"><Eye size={15} /> Preview</Link>
+          </div>
+          {msg && <p className="ed-msg">{msg}</p>}
+          {err && <p className="ed-err">{err}</p>}
+
+          <div className="inbox">
+            <h2>RSVP inbox</h2>
+            <p className="stats">
+              <b>{yes}</b> attending · <b>{no}</b> can&apos;t make it · <b>{rsvps.length}</b> total responses
+            </p>
+            {rsvps.length === 0 ? (
+              <div className="inbox-empty">
+                {published
+                  ? "No responses yet — share your link on WhatsApp and they'll appear here."
+                  : "Publish your invitation and RSVPs will start arriving here."}
+              </div>
+            ) : (
+              rsvps.map((r, i) => (
+                <div className="rsvp-card" key={i}>
+                  <div className="who">
+                    <span className="nm">{r.name}</span>
+                    {r.attending && (
+                      <span className={`tag ${r.attending === "yes" ? "yes" : "no"}`}>
+                        {r.attending === "yes" ? "Attending" : "Can't attend"}
+                      </span>
+                    )}
+                  </div>
+                  {r.email && <div className="em">{r.email}</div>}
+                  {r.message && <div className="ms">“{r.message}”</div>}
+                  <div className="dt">{new Date(r.created_at).toLocaleString("en-IN")}</div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+        <aside className="fx-aside">
+          <LivePreview data={data} label={published ? "Your live invitation" : "Draft preview"} />
+          <Link className="btn ghost" href={`/preview/${token}`} target="_blank"><Eye size={15} /> Open full preview</Link>
+        </aside>
       </div>
-    </div>
+    </FestiveShell>
   );
 }

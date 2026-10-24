@@ -8,7 +8,7 @@ const reducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // Pops a burst of confetti/petals out of `host` (an element with position: relative).
-function burst(host, n = 26) {
+export function burst(host, n = 26) {
   if (!host || reducedMotion()) return;
   for (let i = 0; i < n; i++) {
     const s = document.createElement("span");
@@ -130,7 +130,7 @@ export function LiveCountdown({ iso }) {
   useEffect(() => {
     const target = new Date(iso).getTime();
     const tick = () => {
-      const ms = Math.max(0, target - Date.now());
+      const ms = Math.max(0, (target || 0) - Date.now()); // invalid date → zeros
       setT({
         d: Math.floor(ms / 864e5),
         h: Math.floor(ms / 36e5) % 24,
