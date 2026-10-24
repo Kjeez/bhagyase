@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { mergeData } from "@/lib/defaults";
 import { inviteByToken } from "@/lib/invites";
-import EmeraldNoir from "@/components/EmeraldNoir";
+import { templateOf } from "@/lib/templates";
+import InviteTemplate from "@/components/InviteTemplate";
 import PreviewRibbon from "@/components/PreviewRibbon";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +20,7 @@ export default async function PreviewPage({ params }) {
   return (
     <>
       <PreviewRibbon label={label} cta={{ href: `/edit/${token}`, text: "← Back to editor" }} />
-      <EmeraldNoir data={mergeData(invite.data)} slug={invite.slug} preview />
+      <InviteTemplate template={templateOf(invite)} data={mergeData(invite.data)} slug={invite.slug} preview />
     </>
   );
 }

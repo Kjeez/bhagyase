@@ -43,7 +43,7 @@ export default function EditPage({ params }) {
       const res = await fetch(`/api/invites/token/${token}`, { cache: "no-store" });
       if (!res.ok) throw new Error("Invitation not found");
       const json = await res.json();
-      setData(mergeData(json.data));
+      setData(mergeData({ ...json.data, template: json.template })); // keep older invites on their design
       setInv(json);
     } catch (e) {
       setErr(e.message);

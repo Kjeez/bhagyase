@@ -4,7 +4,8 @@ import { mergeData } from "@/lib/defaults";
 import { DEMO_DATA } from "@/lib/demo";
 import { isExpired } from "@/lib/invites";
 import { PLANS } from "@/lib/plans";
-import EmeraldNoir from "@/components/EmeraldNoir";
+import { templateOf, validTemplate } from "@/lib/templates";
+import InviteTemplate from "@/components/InviteTemplate";
 import InviteStatus from "@/components/InviteStatus";
 import PreviewRibbon from "@/components/PreviewRibbon";
 
@@ -41,14 +42,14 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function InvitePage({ params }) {
+export default async function InvitePage({ params, searchParams }) {
   const { slug } = await params;
 
   if (slug === "demo") {
     return (
       <>
         <PreviewRibbon label="Demo invitation" cta={{ href: "/create", text: "Make yours →" }} />
-        <EmeraldNoir data={DEMO_DATA} slug="demo" preview />
+        <InviteTemplate template={validTemplate((await searchParams)?.style)} data={DEMO_DATA} slug="demo" preview />
       </>
     );
   }
@@ -74,5 +75,5 @@ export default async function InvitePage({ params }) {
   }
 
   data.photos = data.photos.slice(0, PLANS[invite.plan]?.maxPhotos || PLANS.classic.maxPhotos);
-  return <EmeraldNoir data={data} slug={invite.slug} />;
+  return <InviteTemplate template={templateOf(invite)} data={data} slug={invite.slug} />;
 }

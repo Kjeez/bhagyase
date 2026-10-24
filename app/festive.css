@@ -74,6 +74,21 @@ body:has(.fx) { background: #FFF8EC; }
 .lp-fns { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; max-width: 200px; }
 .lp-fns span { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #e9c96a; border: 1px solid #d4af3755; border-radius: 20px; padding: 3px 8px; }
 
+/* Marigold Mela look for the live preview phone */
+.fx .lp.marigold-mela .phone-screen { background: radial-gradient(260px 200px at 50% 0%, #FFE1A8, transparent 70%), #FFF8EC; }
+.fx .lp.marigold-mela .ph-eyebrow { color: #5B4636; }
+.fx .lp.marigold-mela .ph-name { font-family: var(--f-script), cursive; letter-spacing: 0; font-size: 36px; color: var(--sindoor); }
+.fx .lp.marigold-mela .ph-amp { color: var(--marigold); }
+.fx .lp.marigold-mela .ph-line { color: var(--ink); font-style: normal; font-weight: 700; }
+.fx .lp.marigold-mela .ph-rule i { background: var(--antique); }
+.fx .lp.marigold-mela .ph-rule b { border-color: var(--marigold); }
+.fx .lp.marigold-mela .ph-cd span { background: var(--haldi); border: 1.5px solid var(--ink); color: var(--ink); border-radius: 8px; }
+.fx .lp.marigold-mela .ph-cd span:nth-child(2) { background: #F9C6D6; }
+.fx .lp.marigold-mela .ph-cd span:nth-child(3) { background: #BFE4DF; }
+.fx .lp.marigold-mela .ph-cd span:nth-child(4) { background: #CFE3B2; }
+.fx .lp.marigold-mela .ph-cd span i { color: var(--ink-soft); }
+.fx .lp.marigold-mela .lp-fns span { color: var(--sindoor); border-color: #C8102E55; background: #fff; }
+
 /* ---------- form ---------- */
 .fx .wf { gap: 20px; }
 .wf-card {
@@ -101,6 +116,23 @@ body:has(.fx) { background: #FFF8EC; }
 }
 .fx .wf-toggle:hover { transform: translateY(-2px); }
 .fx .wf-toggle.on { background: var(--haldi); color: var(--ink); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+
+/* style picker */
+.wf-styles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.wf-style { display: flex; flex-direction: column; gap: 8px; }
+.wf-style button {
+  text-align: left; display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 18px; cursor: pointer;
+  background: var(--cream); border: 2px solid #2A1A1233; color: var(--ink); font-family: var(--f-body), sans-serif; transition: transform .15s;
+}
+.wf-style button:hover { transform: translateY(-2px); border-color: var(--ink); }
+.wf-style.on button { background: #FFF3C4; border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+.wf-style b { font-family: var(--f-display), serif; font-weight: 400; font-size: 19px; }
+.wf-style button > span:not(.wf-swatch):not(.wf-picked) { font-size: 13.5px; color: var(--ink-soft); line-height: 1.45; }
+.wf-swatch { display: flex; gap: 4px; margin-bottom: 4px; }
+.wf-swatch i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ink); }
+.wf-picked { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--mehendi); }
+.wf-style a { font-size: 13px; font-weight: 700; color: var(--sindoor); display: inline-flex; gap: 4px; align-items: center; padding-left: 4px; }
+@media (max-width: 520px) { .wf-styles { grid-template-columns: 1fr; } }
 
 /* ---------- buttons ---------- */
 .fx .btn {

@@ -28,7 +28,7 @@ export async function POST(req) {
     for (let attempt = 0; attempt < 2; attempt++) {
       const { data: row, error } = await db
         .from("invites")
-        .insert({ slug, template: "emerald-noir", data, owner_id: user?.id || null })
+        .insert({ slug, template: data.template, data, owner_id: user?.id || null })
         .select("slug, edit_token")
         .single();
 

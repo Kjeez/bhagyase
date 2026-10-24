@@ -1,56 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
 import {
   MapPin, Volume2, VolumeX, Clock, Shirt, PartyPopper,
   Car, Building2, Gift, Mail, Send, Check, Heart,
 } from "lucide-react";
 import "./emerald-noir.css";
-
-/* ---------------------------- helpers ----------------------------- */
-
-const fmtDate = (iso) => {
-  const d = new Date(iso);
-  return isNaN(d)
-    ? "—"
-    : d.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-};
-const fmtTime = (iso) => {
-  const d = new Date(iso);
-  return isNaN(d) ? "" : d.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
-};
-
-function useCountdown(iso) {
-  const [t, setT] = useState({ d: 0, h: 0, m: 0, s: 0, past: false });
-  useEffect(() => {
-    const tick = () => {
-      const diff = new Date(iso) - new Date();
-      if (isNaN(diff) || diff <= 0) return setT({ d: 0, h: 0, m: 0, s: 0, past: true });
-      setT({
-        d: Math.floor(diff / 864e5),
-        h: Math.floor(diff / 36e5) % 24,
-        m: Math.floor(diff / 6e4) % 60,
-        s: Math.floor(diff / 1e3) % 60,
-        past: false,
-      });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [iso]);
-  return t;
-}
-
-function useReveal() {
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      (es) => es.forEach((e) => e.isIntersecting && e.target.classList.add("in")),
-      { threshold: 0.15 }
-    );
-    document.querySelectorAll(".en-root .rv").forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  });
-}
+import { useCountdown, useReveal, ScratchCard, Slideshow, useRsvp, useMusic } from "./invite/shared";
 
 /* ------------------------ decorative pieces ----------------------- */
 
@@ -98,142 +53,13 @@ function SecHead({ icon: Icon, title }) {
   );
 }
 
-/* ------------------------- scratch card --------------------------- */
-
-function ScratchCard({ dateISO }) {
-  const cvRef = useRef(null);
-  const [done, setDone] = useState(false);
-  const moves = useRef(0);
-
-  useEffect(() => {
-    const cv = cvRef.current;
-    if (!cv) return;
-    const dpr = window.devicePixelRatio || 1;
-    const w = cv.offsetWidth, h = cv.offsetHeight;
-    cv.width = w * dpr; cv.height = h * dpr;
-    const ctx = cv.getContext("2d");
-    ctx.scale(dpr, dpr);
-    const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, "#a8811f"); g.addColorStop(0.45, "#e9c96a");
-    g.addColorStop(0.55, "#d4af37"); g.addColorStop(1, "#8f6f1d");
-    ctx.fillStyle = g;
-    if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(0, 0, w, h, 14); ctx.fill(); }
-    else ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "rgba(40,32,8,.75)";
-    ctx.font = "600 14px 'EB Garamond', serif";
-    ctx.textAlign = "center";
-    ctx.fillText("✦  Scratch to Reveal  ✦", w / 2, h / 2 + 5);
-  }, []);
-
-  const scratch = useCallback((e) => {
-    const cv = cvRef.current;
-    if (!cv || done) return;
-    const r = cv.getBoundingClientRect();
-    const p = e.touches ? e.touches[0] : e;
-    const ctx = cv.getContext("2d");
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.beginPath();
-    ctx.arc(p.clientX - r.left, p.clientY - r.top, 26, 0, Math.PI * 2);
-    ctx.fill();
-    if (++moves.current % 12 === 0) {
-      const img = ctx.getImageData(0, 0, cv.width, cv.height).data;
-      let clear = 0;
-      for (let i = 3; i < img.length; i += 64) if (img[i] === 0) clear++;
-      if (clear / (img.length / 64) > 0.45) setDone(true);
-    }
-  }, [done]);
-
-  return (
-    <div className="scratch-wrap rv">
-      <div className="scratch-under">
-        <span className="sc-eyebrow">Save the date</span>
-        <span className="sc-date">{fmtDate(dateISO)}</span>
-        <span className="sc-time">{fmtTime(dateISO)} onwards</span>
-      </div>
-      <canvas
-        ref={cvRef}
-        className={`scratch-foil ${done ? "gone" : ""}`}
-        onMouseDown={scratch} onMouseMove={(e) => e.buttons === 1 && scratch(e)}
-        onTouchStart={scratch} onTouchMove={scratch}
-      />
-    </div>
-  );
-}
-
-/* ---------------------------- slideshow --------------------------- */
-
-function Slideshow({ photos }) {
-  const [i, setI] = useState(0);
-  const [err, setErr] = useState({});
-  useEffect(() => {
-    if (photos.length < 2) return;
-    const id = setInterval(() => setI((p) => (p + 1) % photos.length), 4000);
-    return () => clearInterval(id);
-  }, [photos.length]);
-  if (!photos.length) return null;
-  return (
-    <div className="slide rv">
-      {photos.map((src, j) => (
-        <div key={j} className={`slide-img ${j === i ? "on" : ""}`}>
-          {!err[j] ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={src} alt={`Photo ${j + 1}`} onError={() => setErr((e) => ({ ...e, [j]: true }))} />
-          ) : (
-            <div className="slide-fallback"><Heart size={30} strokeWidth={1} /></div>
-          )}
-        </div>
-      ))}
-      {photos.length > 1 && (
-        <div className="slide-dots">
-          {photos.map((_, j) => (
-            <button key={j} className={j === i ? "on" : ""} onClick={() => setI(j)} aria-label={`Photo ${j + 1}`} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ------------------------------ main ------------------------------ */
 
 export default function EmeraldNoir({ data, slug, preview = false }) {
-  const [rsvp, setRsvp] = useState({ name: "", email: "", attending: "", msg: "", faxOnly: "" });
-  const [sent, setSent] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [musicOn, setMusicOn] = useState(false);
-  const audioRef = useRef(null);
+  const { rsvp, set, sent, sending, submit } = useRsvp(slug, preview);
+  const music = useMusic();
   const cd = useCountdown(data.dateISO);
-  useReveal();
-
-  const toggleMusic = () => {
-    const a = audioRef.current;
-    if (!a) return;
-    if (musicOn) { a.pause(); setMusicOn(false); }
-    else { a.play().catch(() => {}); setMusicOn(true); }
-  };
-
-  const submit = async () => {
-    if (!rsvp.name.trim() || sending) return;
-    if (preview) { setSent(true); setTimeout(() => setSent(false), 2000); return; }
-    setSending(true);
-    try {
-      const res = await fetch("/api/rsvp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          slug, name: rsvp.name, email: rsvp.email,
-          attending: rsvp.attending, message: rsvp.msg, faxOnly: rsvp.faxOnly,
-        }),
-      });
-      if (res.ok) {
-        setSent(true);
-        setRsvp({ name: "", email: "", attending: "", msg: "", faxOnly: "" });
-        setTimeout(() => setSent(false), 3000);
-      }
-    } finally {
-      setSending(false);
-    }
-  };
+  useReveal(".en-root");
 
   return (
     <div className="en-root">
@@ -242,9 +68,9 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
 
       {data.musicUrl && (
         <>
-          <audio ref={audioRef} src={data.musicUrl} loop preload="none" />
-          <button className="sound" onClick={toggleMusic} aria-label="Toggle music">
-            {musicOn ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          <audio ref={music.audioRef} src={data.musicUrl} loop preload="none" />
+          <button className="sound" onClick={music.toggle} aria-label="Toggle music">
+            {music.on ? <Volume2 size={18} /> : <VolumeX size={18} />}
           </button>
         </>
       )}
@@ -413,15 +239,13 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
             <SecHead icon={Mail} title="Send a Message" />
             <div className="form rv">
               <label>Your Name
-                <input placeholder="Your full name" value={rsvp.name}
-                  onChange={(e) => setRsvp({ ...rsvp, name: e.target.value })} />
+                <input placeholder="Your full name" value={rsvp.name} onChange={set("name")} />
               </label>
               <label>Email
-                <input placeholder="you@example.com" value={rsvp.email}
-                  onChange={(e) => setRsvp({ ...rsvp, email: e.target.value })} />
+                <input placeholder="you@example.com" value={rsvp.email} onChange={set("email")} />
               </label>
               <label>Will you be attending?
-                <select value={rsvp.attending} onChange={(e) => setRsvp({ ...rsvp, attending: e.target.value })}>
+                <select value={rsvp.attending} onChange={set("attending")}>
                   <option value="">Select…</option>
                   <option value="yes">Joyfully attending</option>
                   <option value="no">Regretfully can&apos;t</option>
@@ -429,10 +253,9 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
               </label>
               {/* honeypot — hidden from people, filled by bots */}
               <input className="hp" tabIndex={-1} autoComplete="off" aria-hidden="true" name="contact_by_fax_only"
-                value={rsvp.faxOnly} onChange={(e) => setRsvp({ ...rsvp, faxOnly: e.target.value })} />
+                value={rsvp.faxOnly} onChange={set("faxOnly")} />
               <label>Your Message
-                <textarea rows={3} placeholder="Write your wishes…" value={rsvp.msg}
-                  onChange={(e) => setRsvp({ ...rsvp, msg: e.target.value })} />
+                <textarea rows={3} placeholder="Write your wishes…" value={rsvp.msg} onChange={set("msg")} />
               </label>
               <button className="btn-gold wide" onClick={submit} disabled={sending}>
                 {sent ? <>Message sent <Check size={15} /></> : <>Send Message <Send size={14} /></>}

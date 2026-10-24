@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { mergeData } from "@/lib/defaults";
 import { inviteByToken } from "@/lib/invites";
+import { templateOf } from "@/lib/templates";
 import { getUser } from "@/lib/supabase/server";
 import { freePublishEnabled, razorpayConfigured } from "@/lib/razorpay";
 
@@ -23,7 +24,7 @@ export async function GET(_req, { params }) {
 
   return NextResponse.json({
     slug: invite.slug,
-    template: invite.template,
+    template: templateOf(invite),
     status: invite.status,
     plan: invite.plan,
     expiresAt: invite.expires_at,
@@ -51,7 +52,7 @@ export async function PUT(req, { params }) {
 
     const { error } = await supabaseAdmin()
       .from("invites")
-      .update({ data, updated_at: new Date().toISOString() })
+      .update({ data, template: data.template, updated_at: new Date().toISOString() })
       .eq("id", invite.id);
 
     if (error) return NextResponse.json({ error: "Could not save" }, { status: 500 });

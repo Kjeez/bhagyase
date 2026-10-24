@@ -234,20 +234,24 @@ export default function Landing() {
             <div className="sec-head reveal">
               <p className="eyebrow">अपना अंदाज़</p>
               <h2>Pick your style</h2>
-              <p>Start with Emerald Noir today. More hand-crafted designs are on their way.</p>
+              <p>Two designs ready today — switch between them any time. More hand-crafted styles are on their way.</p>
             </div>
             <div className="tpl-grid">
-              <Link href="/invite/demo" className="tpl-card reveal">
-                <div className="tpl-thumb t-noir"><span className="tpl-names">Aarav<br />&amp;<br />Meher</span></div>
-                <div className="tpl-meta"><b>Emerald Noir</b><span className="tag live">Available</span></div>
-                <p>Black, gold and candlelight elegance.</p>
-              </Link>
               {[
-                ["t-mela", "Marigold Mela", "Ivory, marigold and rani pink — the most festive one."],
+                ["marigold-mela", "t-mela", "Marigold Mela", "Ivory, marigold and rani pink — curtains, dancing family, the most festive one."],
+                ["emerald-noir", "t-noir", "Emerald Noir", "Black, gold and candlelight elegance."],
+              ].map(([id, cls, name, d], i) => (
+                <Link key={id} href={`/invite/demo?style=${id}`} className="tpl-card reveal" style={{ transitionDelay: `${i * 80}ms` }}>
+                  <div className={`tpl-thumb ${cls}`}><span className="tpl-names">Aarav<br />&amp;<br />Meher</span></div>
+                  <div className="tpl-meta"><b>{name}</b><span className="tag live">See it live</span></div>
+                  <p>{d}</p>
+                </Link>
+              ))}
+              {[
                 ["t-sapphire", "Royal Sapphire", "Midnight blue and gold jharokhas."],
                 ["t-pastel", "Pastel Mehendi", "Sage, blush and delicate henna lines."],
               ].map(([cls, name, d], i) => (
-                <div key={cls} className="tpl-card soon reveal" style={{ transitionDelay: `${(i + 1) * 80}ms` }} aria-disabled="true">
+                <div key={cls} className="tpl-card soon reveal" style={{ transitionDelay: `${(i + 2) * 80}ms` }} aria-disabled="true">
                   <div className={`tpl-thumb ${cls}`}><span className="tpl-names">Aarav<br />&amp;<br />Meher</span></div>
                   <div className="tpl-meta"><b>{name}</b><span className="tag">Coming soon</span></div>
                   <p>{d}</p>

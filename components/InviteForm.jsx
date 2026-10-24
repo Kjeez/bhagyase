@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, Heart, CalendarHeart, Camera, Clock, MapPin, Shirt, Sparkles, Car, LayoutGrid } from "lucide-react";
+import { Check, Heart, CalendarHeart, Camera, Clock, MapPin, Shirt, Sparkles, Car, LayoutGrid, Palette, ExternalLink } from "lucide-react";
+import { TEMPLATES } from "@/lib/templates";
 
 function F({ label, children }) {
   return (
@@ -48,6 +49,22 @@ export default function InviteForm({ data, setData }) {
 
   return (
     <div className="wf">
+      <Card icon={Palette} title="Choose your style" hint="You can switch any time — your details stay the same." acc="#E0457B">
+        <div className="wf-styles" role="radiogroup" aria-label="Invitation style">
+          {Object.values(TEMPLATES).map((t) => (
+            <div key={t.id} className={`wf-style ${data.template === t.id ? "on" : ""}`}>
+              <button type="button" role="radio" aria-checked={data.template === t.id} onClick={() => up("template", t.id)}>
+                <span className="wf-swatch" aria-hidden="true">{t.swatch.map((c) => <i key={c} style={{ background: c }} />)}</span>
+                <b>{t.name}</b>
+                <span>{t.blurb}</span>
+                {data.template === t.id && <span className="wf-picked"><Check size={13} /> Selected</span>}
+              </button>
+              <a href={`/invite/demo?style=${t.id}`} target="_blank" rel="noreferrer">See a sample <ExternalLink size={12} /></a>
+            </div>
+          ))}
+        </div>
+      </Card>
+
       <Card icon={Heart} title="The couple" hint="Names exactly as you'd like them printed." acc="#F7B7A3">
         <div className="wf-row2">
           <F label="Groom *"><input value={data.groom} onChange={(e) => up("groom", e.target.value)} /></F>

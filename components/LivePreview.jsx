@@ -12,7 +12,7 @@ export default function LivePreview({ data, label = "Live preview" }) {
   const date = longDate(data.dateISO);
   const fns = data.preEvents.filter((e) => e.title?.trim()).slice(0, 4);
   return (
-    <div className="lp" id="preview">
+    <div className={`lp ${data.template}`} id="preview">
       <span className="lp-label"><i className="lp-dot" /> {label}</span>
       <div className="phone lp-phone" aria-label="Invitation preview">
         <div className="phone-in">
