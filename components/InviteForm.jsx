@@ -1,7 +1,11 @@
 "use client";
 
-import { Check, Heart, CalendarHeart, Camera, Clock, MapPin, Shirt, Sparkles, Car, LayoutGrid, Palette, ExternalLink } from "lucide-react";
+import {
+  Check, Heart, CalendarHeart, Camera, Clock, MapPin, Shirt, Sparkles, Car, LayoutGrid, Palette, ExternalLink,
+  Users, PartyPopper, BookHeart,
+} from "lucide-react";
 import { TEMPLATES } from "@/lib/templates";
+import { BLESSINGS } from "@/lib/inviteView";
 
 function F({ label, children }) {
   return (
@@ -46,6 +50,7 @@ export default function InviteForm({ data, setData }) {
   const upArr = (arr, i, k, v) =>
     setData((d) => ({ ...d, [arr]: d[arr].map((e, j) => (j === i ? { ...e, [k]: v } : e)) }));
   const upShow = (k) => setData((d) => ({ ...d, show: { ...d.show, [k]: !d.show[k] } }));
+  const upIn = (k, sub, v) => setData((d) => ({ ...d, [k]: { ...d[k], [sub]: v } }));
 
   return (
     <div className="wf">
@@ -80,10 +85,30 @@ export default function InviteForm({ data, setData }) {
           <F label="Bride extra line 1"><input value={data.brideLine1} onChange={(e) => up("brideLine1", e.target.value)} placeholder="(optional)" /></F>
           <F label="Bride extra line 2"><input value={data.brideLine2} onChange={(e) => up("brideLine2", e.target.value)} placeholder="(optional)" /></F>
         </div>
-        <F label="Your story (optional — shown in Royal Palace)">
-          <textarea rows={3} value={data.story} onChange={(e) => up("story", e.target.value)}
-            placeholder="How you met, your first trip, the proposal… Leave a blank line between paragraphs." />
-        </F>
+      </Card>
+
+      <Card icon={Users} title="Families & blessings"
+        hint="Each family gets its own link that shows their names first, their elders and their contact." acc="#E7C6F0">
+        {[["groom", "Groom's family", "Late Smt. & Sh. Saib"], ["bride", "Bride's family", "Smt. & Sh. Sharma"]].map(([who, label, gp]) => (
+          <div className="wf-block" key={who}>
+            <b className="wf-block-title">{label}</b>
+            <F label="Blessing at the top">
+              <select value={data.blessing[who]} onChange={(e) => upIn("blessing", who, e.target.value)}>
+                {Object.entries(BLESSINGS).map(([id, b]) => <option key={id} value={id}>{b.label}</option>)}
+              </select>
+            </F>
+            <F label="Grandparents (optional)">
+              <input value={data[`${who}Grandparents`]} onChange={(e) => up(`${who}Grandparents`, e.target.value)} placeholder={gp} />
+            </F>
+            <F label="Family name (optional)">
+              <input value={data[`${who}Family`]} onChange={(e) => up(`${who}Family`, e.target.value)} placeholder={who === "groom" ? "Saib & Rooprai Family" : "Sharma Parivar"} />
+            </F>
+            <div className="wf-row2">
+              <F label="Contact person"><input value={data[`${who}Contact`].name} onChange={(e) => upIn(`${who}Contact`, "name", e.target.value)} placeholder="Name" /></F>
+              <F label="Contact phone"><input type="tel" value={data[`${who}Contact`].phone} onChange={(e) => upIn(`${who}Contact`, "phone", e.target.value)} placeholder="+91 98…" /></F>
+            </div>
+          </div>
+        ))}
       </Card>
 
       <Card icon={CalendarHeart} title="The big day" hint="Your countdown and scratch card use this date." acc="#FFD54A">
@@ -93,6 +118,28 @@ export default function InviteForm({ data, setData }) {
         <F label="Wedding date & time *">
           <input type="datetime-local" value={data.dateISO} onChange={(e) => up("dateISO", e.target.value)} />
         </F>
+      </Card>
+
+      <Card icon={PartyPopper} title="Reception (optional)"
+        hint="Add a reception and you get a separate reception-only link to share." acc="#BFD7F2">
+        <F label="Reception date & time">
+          <input type="datetime-local" value={data.reception.dateISO} onChange={(e) => upIn("reception", "dateISO", e.target.value)} />
+        </F>
+        <F label="Venue name"><input value={data.reception.venueName} onChange={(e) => upIn("reception", "venueName", e.target.value)} /></F>
+        <F label="Address"><input value={data.reception.venueAddress} onChange={(e) => upIn("reception", "venueAddress", e.target.value)} /></F>
+        <F label="Google Maps link"><input value={data.reception.mapsUrl} onChange={(e) => upIn("reception", "mapsUrl", e.target.value)} placeholder="https://maps.google.com/?q=…" /></F>
+      </Card>
+
+      <Card icon={BookHeart} title="Your story" hint="Optional — up to four little chapters of how you got here." acc="#F7D9A8">
+        <F label="Tagline under your names"><input value={data.tagline} onChange={(e) => up("tagline", e.target.value)} placeholder="From a Delhi school to forever" /></F>
+        <F label="Places that shaped you (comma separated)"><input value={data.journey} onChange={(e) => up("journey", e.target.value)} placeholder="Himachal, Delhi, Punjab" /></F>
+        <F label="Story headline"><input value={data.storyIntro} onChange={(e) => up("storyIntro", e.target.value)} placeholder="Ek Punjabi Munda, Ek Pahadi Kudi" /></F>
+        {data.storyChapters.map((c, i) => (
+          <div className="wf-block" key={i}>
+            <F label={`Chapter ${i + 1} title`}><input value={c.title} onChange={(e) => upArr("storyChapters", i, "title", e.target.value)} placeholder={["Where it all began", "Growing up, together", "Finding home", "And now, forever"][i]} /></F>
+            <F label="What happened"><textarea rows={2} value={c.text} onChange={(e) => upArr("storyChapters", i, "text", e.target.value)} /></F>
+          </div>
+        ))}
       </Card>
 
       <Card icon={Camera} title="Photos & music" hint="Optional — paste links to your photos and a song." acc="#BFE4DF">

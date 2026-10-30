@@ -5,112 +5,22 @@
 // The drawing helpers below are carried over unchanged from that project.
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { MapPin, Play, Pause, Check, CalendarPlus } from "lucide-react";
+import { MapPin, Play, Pause, Check, CalendarPlus, Phone } from "lucide-react";
 import "./royal-palace.css";
 import { royalFonts } from "@/lib/fonts";
 import { useRsvp } from "./invite/shared";
+import { BlessingVerses, StoryChapters } from "./invite/extras";
+import { viewOf, viaNote, BLESSINGS } from "@/lib/inviteView";
+import {
+  toDate, dotDate, longDate, initial, buildSchedule, buildVenues, rsvpChoices, calendarUrl,
+} from "@/lib/inviteSchedule";
 
 const IMG = "/templates/royal";
-
-/* =========================================================
-   Turning the couple's details into the Royal layout
-   ========================================================= */
-const toDate = (iso) => {
-  const d = new Date(iso);
-  return isNaN(d) ? null : d;
-};
-const dotDate = (d) => (d ? `${d.getDate()} · ${d.getMonth() + 1} · ${d.getFullYear()}` : "");
-const longDate = (d) =>
-  d ? d.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) : "";
-const dayMonth = (d) => (d ? d.toLocaleDateString("en-IN", { day: "numeric", month: "long" }) : "");
-const initial = (s) => (s?.trim()[0] || "").toUpperCase();
-
-// "5 Dec 2026, 10:00 AM" → ["5 Dec 2026", "10:00 AM"]
-function splitWhen(when = "") {
-  const i = when.lastIndexOf(",");
-  return i > 0 ? [when.slice(0, i).trim(), when.slice(i + 1).trim()] : [when.trim(), ""];
-}
-
-function weekdayOf(day) {
-  const d = new Date(day);
-  return isNaN(d) ? "" : d.toLocaleDateString("en-IN", { weekday: "long" });
-}
-
-// Functions + wedding-day timeline, grouped by the day they happen on.
-function buildSchedule(data, wedding) {
-  const items = [
-    ...(data.show.preEvents ? data.preEvents.filter((e) => e.title && e.when).map((e) => ({ title: e.title, when: e.when, note: e.where })) : []),
-    ...(data.show.timeline ? data.timeline.filter((t) => t.title).map((t) => ({ title: t.title, when: t.when, note: t.desc })) : []),
-  ];
-  const days = [];
-  for (const it of items) {
-    let [date, time] = splitWhen(it.when);
-    if (!date) date = dayMonth(wedding);
-    let g = days.find((d) => d.date === date);
-    if (!g) {
-      g = { date, day: weekdayOf(date) || (date === dayMonth(wedding) ? weekdayOf(wedding) : ""), items: [] };
-      days.push(g);
-    }
-    g.items.push({ time, title: it.title, note: it.note });
-  }
-  return days;
-}
 
 function sketchFor(title) {
   if (/reception/i.test(title)) return `${IMG}/sketch-reception.png`;
   if (/sangeet|mehe?ndi|haldi|cocktail|ring|engagement/i.test(title)) return `${IMG}/sketch-palace.png`;
   return `${IMG}/sketch-wedding.png`;
-}
-
-const mapsSearch = (q) => `https://maps.google.com/?q=${encodeURIComponent(q)}`;
-
-// One tab per place; functions held at the same place share a tab.
-function buildVenues(data, wedding) {
-  const venues = [];
-  if (data.show.preEvents) {
-    data.preEvents.filter((e) => e.title && e.where).forEach((e) => {
-      const same = venues.find((v) => v.name.toLowerCase() === e.where.trim().toLowerCase());
-      const [date] = splitWhen(e.when);
-      if (same) {
-        same.tab += ` & ${e.title}`;
-        same.event = `${same.tab}${date ? ` · ${date}` : ""}`;
-        return;
-      }
-      venues.push({
-        key: `v${venues.length}`,
-        tab: e.title,
-        event: `${e.title}${date ? ` · ${date}` : ""}`,
-        name: e.where.trim(),
-        address: "",
-        sketch: sketchFor(e.title),
-        maps: mapsSearch(e.where),
-      });
-    });
-  }
-  if (data.venueName) {
-    venues.push({
-      key: "main",
-      tab: "Wedding",
-      event: `Wedding Ceremony${wedding ? ` · ${dayMonth(wedding)}` : ""}`,
-      name: data.venueName,
-      address: data.venueAddress,
-      sketch: `${IMG}/sketch-wedding.png`,
-      maps: data.mapsUrl || mapsSearch(`${data.venueName} ${data.venueAddress}`),
-    });
-  }
-  return venues;
-}
-
-function calendarUrl(data, wedding) {
-  if (!wedding) return null;
-  const stamp = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-  const end = new Date(wedding.getTime() + 5 * 36e5);
-  return (
-    "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-    "&text=" + encodeURIComponent(`${data.groom} & ${data.bride} — Wedding`) +
-    "&dates=" + stamp(wedding) + "/" + stamp(end) +
-    "&location=" + encodeURIComponent([data.venueName, data.venueAddress].filter(Boolean).join(", "))
-  );
 }
 
 /* =========================================================
@@ -706,7 +616,8 @@ function Venues({ venues }) {
 /* =========================================================
    Main invitation
    ========================================================= */
-export default function RoyalPalace({ data, slug, preview = false }) {
+export default function RoyalPalace({ data, slug, preview = false, side = "both", event = "wedding" }) {
+  const view = viewOf(data, side, event);
   // envelope: 'intro' -> 'ready' -> 'opening' -> 'done'
   const [stage, setStage] = useState("intro");
   const stageRef = useRef("intro");
@@ -714,25 +625,21 @@ export default function RoyalPalace({ data, slug, preview = false }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [burst, setBurst] = useState(false);
   const audioRef = useRef(null);
-  const wedding = toDate(data.dateISO);
-  const countdown = useCountdown(data.dateISO);
+  const wedding = toDate(view.dateISO);
+  const countdown = useCountdown(view.dateISO);
 
-  const schedule = buildSchedule(data, wedding);
-  const venues = buildVenues(data, wedding);
-  const calendar = calendarUrl(data, wedding);
-  const initials = `${initial(data.groom)}${initial(data.bride)}`;
-  const place = (data.venueAddress || "").split(",").pop().trim() || data.venueName;
-  const story = (data.story || "").split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const schedule = buildSchedule(data, view);
+  const venues = buildVenues(data, view, sketchFor);
+  const calendar = calendarUrl(view);
+  const initials = `${initial(view.first.name)}${initial(view.second.name)}`;
+  const place = (view.venue.address || "").split(",").pop().trim() || view.venue.name;
   const photos = data.show.slideshow ? data.photos : [];
-  const rsvpEvents = [
-    ...new Set([
-      ...(data.show.preEvents ? data.preEvents.filter((e) => e.title && e.when).map((e) => e.title) : []),
-      "Wedding",
-    ]),
-  ];
+  const rsvpEvents = rsvpChoices(data, view);
+  const kicker = view.blessings.map((b) => BLESSINGS[b].kicker).join("   ");
+  const dayLabel = view.isReception ? "Wedding Reception" : "Wedding Day";
 
-  const { rsvp, set, submit, sending } = useRsvp(slug, preview);
-  const [events, setEvents] = useState(["Wedding"]);
+  const { rsvp, set, submit, sending } = useRsvp(slug, preview, viaNote(view));
+  const [events, setEvents] = useState(() => rsvpEvents.filter((e) => /^(Wedding|Reception)/.test(e)).slice(0, 1));
   const [submitted, setSubmitted] = useState(false);
   const firstName = useRef("");
 
@@ -856,11 +763,11 @@ export default function RoyalPalace({ data, slug, preview = false }) {
           <div className="env-inside" />
           <div className="env-card" aria-hidden="true">
             <div className="env-card-inner">
-              <span className="env-card-kicker">॥ श्री गणेशाय नमः ॥</span>
-              <span className="env-card-sub">Together with their families</span>
-              <span className="script env-card-name">{data.groom}</span>
+              {kicker && <span className="env-card-kicker">{kicker}</span>}
+              <span className="env-card-sub">{view.isReception ? "Reception in honour of" : "Together with their families"}</span>
+              <span className="script env-card-name">{view.first.name}</span>
               <span className="script env-card-amp">&amp;</span>
-              <span className="script env-card-name">{data.bride}</span>
+              <span className="script env-card-name">{view.second.name}</span>
               <span className="env-card-date">{dotDate(wedding)}</span>
             </div>
           </div>
@@ -965,9 +872,12 @@ export default function RoyalPalace({ data, slug, preview = false }) {
           <Embers />
           <div className="hero-copy-wrap">
             <div className="hero-copy">
-              <Ganesha className="hero-ganesh" />
-              <p className="hero-kicker">॥ श्री गणेशाय नमः ॥</p>
-              <p className="script hero-day">Wedding Day</p>
+              {view.blessings.includes("ganesh") && <Ganesha className="hero-ganesh" />}
+              {!view.blessings.includes("ganesh") && view.blessings.includes("ikonkar") && (
+                <span className="hero-onkar" lang="pa" aria-hidden="true">ੴ</span>
+              )}
+              {kicker && view.blessings.includes("ganesh") && <p className="hero-kicker">{kicker}</p>}
+              <p className="script hero-day">{dayLabel}</p>
               <p className="hero-date">
                 <i />
                 {dotDate(wedding)}
@@ -975,10 +885,11 @@ export default function RoyalPalace({ data, slug, preview = false }) {
               </p>
               {place && <p className="hero-place">{place}</p>}
               <h1 className="hero-names">
-                <span className="hn-1">{data.groom}</span>
+                <span className="hn-1">{view.first.name}</span>
                 <span className="hn-amp">&amp;</span>
-                <span className="hn-2">{data.bride}</span>
+                <span className="hn-2">{view.second.name}</span>
               </h1>
+              {view.tagline && <p className="hero-tagline">{view.tagline}</p>}
             </div>
           </div>
           <button
@@ -1006,28 +917,25 @@ export default function RoyalPalace({ data, slug, preview = false }) {
         <section className="sec wine">
           <Tear seed={1} tone="wine" />
           <Sparkles count={14} />
-          <p className="shloka rv rv-blur">
-            वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ।
-            <br />
-            निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥
-          </p>
+          <BlessingVerses view={view} className="shloka rv rv-blur" />
           <Title>Dear Friends &amp; Family,</Title>
           <p className="body-copy rv rv-blur">
             {data.welcomeMsg ||
-              "With the divine grace of the Almighty and the heartfelt blessings of our elders, we request the honour of your gracious presence as we begin our forever."}
+              (view.isReception
+                ? "With joy in our hearts and the blessings of our elders, we invite you to celebrate the newly-weds at their wedding reception."
+                : "With the divine grace of the Almighty and the heartfelt blessings of our elders, we request the honour of your gracious presence as we begin our forever.")}
           </p>
           <div className="couple">
-            <div className="person rv rv-l">
-              <div className="person-name">{data.groom}</div>
-              {data.groomParents && <div className="person-parents">{data.groomParents}</div>}
-              {data.groomLine1 && <div className="person-parents">{data.groomLine1}</div>}
-            </div>
-            <div className="script couple-with rv rv-z">with</div>
-            <div className="person rv rv-r">
-              <div className="person-name">{data.bride}</div>
-              {data.brideParents && <div className="person-parents">{data.brideParents}</div>}
-              {data.brideLine1 && <div className="person-parents">{data.brideLine1}</div>}
-            </div>
+            {view.couple.map((p, i) => (
+              <div key={p.who} className="couple-part">
+                {i > 0 && <div className="script couple-with rv rv-z">with</div>}
+                <div className={`person rv ${i ? "rv-r" : "rv-l"}`}>
+                  <div className="person-name">{p.name}</div>
+                  {p.parents && <div className="person-parents">{p.parents}</div>}
+                  {p.lines.map((l) => <div key={l} className="person-parents">{l}</div>)}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -1092,27 +1000,22 @@ export default function RoyalPalace({ data, slug, preview = false }) {
         {/* =========================================================
             OUR STORY
             ========================================================= */}
-        {(story.length > 0 || photos.length > 0) && (
+        {(view.chapters.length > 0 || photos.length > 0) && (
           <section className="sec wine">
             <Tear seed={5} tone="wine" />
-            <Title>Our Story</Title>
+            <Title>{data.storyIntro || "Our Story"}</Title>
+            {view.journey.length > 0 && <p className="journey rv">{view.journey.join("  ·  ")}</p>}
             {photos.length > 0 && (
               <div className="frames rv rv-none">
                 {photos.slice(0, 2).map((src, i) => (
                   <figure key={src} className={`frame ${i ? "frame-b" : "frame-a"}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt={i ? "" : `${data.groom} and ${data.bride}`} loading="lazy" />
+                    <img src={src} alt={i ? "" : view.names.replace("&", "and")} loading="lazy" />
                   </figure>
                 ))}
               </div>
             )}
-            {story.length > 0 && (
-              <div className="story">
-                {story.map((p, i) => (
-                  <p key={i} className="body-copy rv rv-blur">{p}</p>
-                ))}
-              </div>
-            )}
+            <StoryChapters view={view} className="story" />
           </section>
         )}
 
@@ -1124,7 +1027,7 @@ export default function RoyalPalace({ data, slug, preview = false }) {
           <Title>With Love &amp; Blessings</Title>
           <div className="family">
             {[
-              (data.groomParents || data.brideParents) && ["Parents", [data.groomParents, data.brideParents].filter(Boolean).join("\n")],
+              ...view.familyRows,
               ...guestInfo,
               ["With Best Compliments", "All Near & Dear Ones"],
             ]
@@ -1192,7 +1095,7 @@ export default function RoyalPalace({ data, slug, preview = false }) {
                     <span>Wishes for the couple</span>
                     <textarea
                       rows={3}
-                      placeholder={`Write your blessings for ${data.groom} & ${data.bride}…`}
+                      placeholder={`Write your blessings for ${view.names}…`}
                       value={rsvp.msg}
                       onChange={set("msg")}
                     />
@@ -1205,10 +1108,21 @@ export default function RoyalPalace({ data, slug, preview = false }) {
             </>
           )}
 
+          {view.contacts.length > 0 && (
+            <div className="contacts rv">
+              <div className="contacts-title">For any assistance</div>
+              {view.contacts.map((c) => (
+                <a key={c.name + c.phone} className="contact" href={c.phone ? `tel:${c.phone.replace(/[^+\d]/g, "")}` : undefined}>
+                  <Phone size={15} /> {c.name} {c.phone && <b>{c.phone}</b>}
+                </a>
+              ))}
+            </div>
+          )}
+
           <div className="finale rv rv-none">
             <Sparkles count={18} />
             <p className="script finale-hope">{data.closing || "Hope to see you there!"}</p>
-            <p className="finale-names">{data.groom} &amp; {data.bride}</p>
+            <p className="finale-names">{view.names}</p>
           </div>
         </section>
 
@@ -1217,7 +1131,7 @@ export default function RoyalPalace({ data, slug, preview = false }) {
           <img src={photos[0] || `${IMG}/palace-night.jpg`} alt="" loading="lazy" />
           <div className="outro-fade" />
           <div className="outro-copy">
-            <span className="script">Forever begins</span>
+            <span className="script">{view.isReception ? "Celebrate with us" : "Forever begins"}</span>
             <span className="outro-date">{dotDate(wedding)}</span>
           </div>
         </footer>

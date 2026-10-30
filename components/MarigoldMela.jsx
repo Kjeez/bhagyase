@@ -12,6 +12,8 @@ import {
 } from "@/components/landing/Art";
 import { PetalRain, burst } from "@/components/landing/Motion";
 import { fmtDate, fmtTime, useCountdown, useReveal, ScratchCard, Slideshow, useRsvp, useMusic } from "./invite/shared";
+import { BlessingLines, StoryChapters, FamilyBlock } from "./invite/extras";
+import { viewOf, viaNote } from "@/lib/inviteView";
 
 // Picks an illustration, colour world and Hindi name for a function from its title.
 const FUNCTION_STYLES = [
@@ -45,7 +47,7 @@ function Sec({ title, hi, tone = "", children }) {
 }
 
 // Full-screen curtains that part when the guest taps — the "opening the envelope" moment.
-function Curtain({ data, onOpen }) {
+function Curtain({ view, onOpen }) {
   const [state, setState] = useState("closed"); // closed → opening → gone
   useEffect(() => {
     document.body.style.overflow = state === "gone" ? "" : "hidden";
@@ -64,18 +66,20 @@ function Curtain({ data, onOpen }) {
       <Toran units={12} className="mm-curtain-toran" />
       <div className="mm-seal">
         <p className="mm-hi" lang="hi">सादर आमंत्रण</p>
-        <p className="mm-seal-names">{data.groom} <span>&amp;</span> {data.bride}</p>
-        <p className="mm-seal-date">{fmtDate(data.dateISO)}</p>
+        <p className="mm-seal-names">{view.first.name} <span>&amp;</span> {view.second.name}</p>
+        {view.isReception && <p className="mm-seal-kind">Wedding Reception</p>}
+        <p className="mm-seal-date">{fmtDate(view.dateISO)}</p>
         <button className="mm-btn" onClick={open} autoFocus>Tap to open ✨</button>
       </div>
     </div>
   );
 }
 
-export default function MarigoldMela({ data, slug, preview = false }) {
-  const { rsvp, set, setField, sent, sending, submit } = useRsvp(slug, preview);
+export default function MarigoldMela({ data, slug, preview = false, side = "both", event = "wedding" }) {
+  const view = viewOf(data, side, event);
+  const { rsvp, set, setField, sent, sending, submit } = useRsvp(slug, preview, viaNote(view));
   const music = useMusic();
-  const cd = useCountdown(data.dateISO);
+  const cd = useCountdown(view.dateISO);
   const heroRef = useRef(null);
   const rsvpRef = useRef(null);
   const scratchRef = useRef(null);
@@ -90,12 +94,13 @@ export default function MarigoldMela({ data, slug, preview = false }) {
     if (await submit()) burst(rsvpRef.current, 36);
   };
 
-  const fns = data.preEvents.filter((e) => e.title && e.when);
-  const tl = data.timeline.filter((t) => t.title);
+  // the reception-only invite leaves out the wedding-day schedule
+  const fns = view.isReception ? [] : data.preEvents.filter((e) => e.title && e.when);
+  const tl = view.isReception ? [] : data.timeline.filter((t) => t.title);
 
   return (
     <div className={`mm-root ${landingFonts}`}>
-      <Curtain data={data} onOpen={onOpen} />
+      <Curtain view={view} onOpen={onOpen} />
 
       {data.musicUrl && (
         <>
@@ -111,19 +116,22 @@ export default function MarigoldMela({ data, slug, preview = false }) {
         <Toran units={12} className="mm-toran" />
         <PetalRain count={14} />
         <div className="mm-arch">
+          <BlessingLines view={view} className="mm-blessing" />
           <p className="mm-hi" lang="hi">शुभ विवाह</p>
           <p className="mm-eyebrow">Together with their families</p>
-          <h1 className="mm-name">{data.groom}</h1>
-          {data.groomParents && <p className="mm-line">{data.groomParents}</p>}
-          {data.groomLine1 && <p className="mm-line">{data.groomLine1}</p>}
-          {data.groomLine2 && <p className="mm-line">{data.groomLine2}</p>}
-          <span className="mm-weds">weds</span>
-          <h1 className="mm-name">{data.bride}</h1>
-          {data.brideParents && <p className="mm-line">{data.brideParents}</p>}
-          {data.brideLine1 && <p className="mm-line">{data.brideLine1}</p>}
-          {data.brideLine2 && <p className="mm-line">{data.brideLine2}</p>}
-          <p className="mm-request">request the pleasure of your company to celebrate their wedding</p>
-          <p className="mm-date-pill">{fmtDate(data.dateISO)}</p>
+          {view.couple.map((p, i) => (
+            <div key={p.who}>
+              {i > 0 && <span className="mm-weds">weds</span>}
+              <h1 className="mm-name">{p.name}</h1>
+              {p.parents && <p className="mm-line">{p.parents}</p>}
+              {p.lines.map((l) => <p key={l} className="mm-line">{l}</p>)}
+            </div>
+          ))}
+          <p className="mm-request">
+            request the pleasure of your company to celebrate their {view.isReception ? "wedding reception" : "wedding"}
+          </p>
+          <p className="mm-date-pill">{fmtDate(view.dateISO)}</p>
+          {view.tagline && <p className="mm-tagline">{view.tagline}</p>}
         </div>
         <div className="mm-cast" aria-hidden="true">
           <Kid className="mm-ch kid" />
@@ -151,7 +159,7 @@ export default function MarigoldMela({ data, slug, preview = false }) {
           <Sec title="Scratch to reveal the date" hi="शुभ मुहूर्त">
             <div className="mm-scratch" ref={scratchRef}>
               <ScratchCard
-                dateISO={data.dateISO}
+                dateISO={view.dateISO}
                 foil={FOIL}
                 ink="rgba(60,10,10,.8)"
                 font="800 15px Manrope, sans-serif"
@@ -161,10 +169,15 @@ export default function MarigoldMela({ data, slug, preview = false }) {
           </Sec>
         )}
 
-        {/* PHOTOS */}
-        {data.show.slideshow && data.photos.length > 0 && (
+        {/* PHOTOS + STORY */}
+        {((data.show.slideshow && data.photos.length > 0) || view.chapters.length > 0) && (
           <Sec title="Our story" hi="हमारी कहानी">
-            <div className="mm-polaroid rv"><Slideshow photos={data.photos} /></div>
+            {data.show.slideshow && data.photos.length > 0 && (
+              <div className="mm-polaroid rv"><Slideshow photos={data.photos} /></div>
+            )}
+            {data.storyIntro && <p className="mm-story-intro rv">{data.storyIntro}</p>}
+            {view.journey.length > 0 && <p className="mm-journey rv">{view.journey.join("  ✿  ")}</p>}
+            <StoryChapters view={view} className="mm-chapters" />
           </Sec>
         )}
 
@@ -226,18 +239,38 @@ export default function MarigoldMela({ data, slug, preview = false }) {
         )}
 
         {/* VENUE */}
-        {data.venueName && (
+        {view.venue.name && (
           <Sec title="Where to find us" hi="स्थान">
             <div className="mm-venue rv">
-              <PherasScene />
-              <p className="mm-venue-name">{data.venueName}</p>
-              {data.venueAddress && <p className="mm-venue-addr">{data.venueAddress}</p>}
-              <p className="mm-venue-time">{fmtDate(data.dateISO)} · {fmtTime(data.dateISO)} onwards</p>
-              {data.mapsUrl && (
-                <a className="mm-btn" href={data.mapsUrl} target="_blank" rel="noreferrer">
+              {view.isReception ? <ReceptionScene /> : <PherasScene />}
+              <p className="mm-venue-name">{view.venue.name}</p>
+              {view.venue.address && <p className="mm-venue-addr">{view.venue.address}</p>}
+              <p className="mm-venue-time">{fmtDate(view.dateISO)} · {fmtTime(view.dateISO)} onwards</p>
+              {view.venue.maps && (
+                <a className="mm-btn" href={view.venue.maps} target="_blank" rel="noreferrer">
                   <Navigation size={17} /> Open in Google Maps
                 </a>
               )}
+            </div>
+          </Sec>
+        )}
+
+        {/* RECEPTION (on the full invite) */}
+        {!view.isReception && view.reception?.venueName && (
+          <Sec title="And the reception" hi="रिसेप्शन">
+            <div className="mm-venue rv">
+              <ReceptionScene />
+              <p className="mm-venue-name">{view.reception.venueName}</p>
+              {view.reception.venueAddress && <p className="mm-venue-addr">{view.reception.venueAddress}</p>}
+              <p className="mm-venue-time">{fmtDate(view.reception.dateISO)} · {fmtTime(view.reception.dateISO)} onwards</p>
+              <a
+                className="mm-btn"
+                href={view.reception.mapsUrl || `https://maps.google.com/?q=${encodeURIComponent(`${view.reception.venueName} ${view.reception.venueAddress}`)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Navigation size={17} /> Open in Google Maps
+              </a>
             </div>
           </Sec>
         )}
@@ -270,6 +303,13 @@ export default function MarigoldMela({ data, slug, preview = false }) {
                 <div className="mm-card rv"><span className="mm-ic"><Gift size={20} /></span><b>Gifts</b><p>{data.giftsNote}</p></div>
               )}
             </div>
+          </Sec>
+        )}
+
+        {/* FAMILY & CONTACTS */}
+        {(view.familyRows.length > 0 || view.contacts.length > 0) && (
+          <Sec title="With love & blessings" hi="आशीर्वाद सहित">
+            <FamilyBlock view={view} className="mm-family" />
           </Sec>
         )}
 
@@ -312,7 +352,7 @@ export default function MarigoldMela({ data, slug, preview = false }) {
         <div className="mm-finale-copy rv">
           <p className="mm-hi light" lang="hi">आपके आशीर्वाद के साथ</p>
           <p className="mm-close-line">{data.closing}</p>
-          <p className="mm-close-names">{data.groom} &amp; {data.bride}</p>
+          <p className="mm-close-names">{view.names}</p>
         </div>
         <div className="mm-road" aria-hidden="true">
           <div className="mm-procession">

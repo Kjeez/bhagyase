@@ -152,8 +152,9 @@ export function Slideshow({ photos }) {
 
 const EMPTY_RSVP = { name: "", email: "", attending: "", msg: "", faxOnly: "" };
 
-// RSVP form state + submit. In preview mode nothing is saved.
-export function useRsvp(slug, preview) {
+// RSVP form state + submit. In preview mode nothing is saved. `note` (e.g. which
+// family's link was used) is added to the guest's message.
+export function useRsvp(slug, preview, note = "") {
   const [rsvp, setRsvp] = useState(EMPTY_RSVP);
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
@@ -176,7 +177,7 @@ export function useRsvp(slug, preview) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slug, name: rsvp.name, email: rsvp.email,
-          attending: over.attending ?? rsvp.attending, message: over.message ?? rsvp.msg, faxOnly: rsvp.faxOnly,
+          attending: over.attending ?? rsvp.attending, message: [over.message ?? rsvp.msg, note].filter(Boolean).join("\n\n"), faxOnly: rsvp.faxOnly,
         }),
       });
       if (!res.ok) return false;

@@ -8,6 +8,7 @@ import LivePreview from "@/components/LivePreview";
 import PublishPanel from "@/components/PublishPanel";
 import { mergeData } from "@/lib/defaults";
 import { PLANS } from "@/lib/plans";
+import { viewPath, hasReception } from "@/lib/inviteView";
 import { Copy, Check, ExternalLink, Eye } from "lucide-react";
 
 function CopyBtn({ text }) {
@@ -23,6 +24,53 @@ function CopyBtn({ text }) {
     <button className="btn ghost" onClick={copy}>
       {done ? <Check size={15} /> : <Copy size={15} />} Copy
     </button>
+  );
+}
+
+// Every way the invite can be shared: both families, each family's own link,
+// and reception-only versions when a reception is set.
+function linksFor(data, slug) {
+  const rows = [
+    { side: "both", event: "wedding", label: "Both families", names: `${data.groom} & ${data.bride}` },
+    { side: "groom", event: "wedding", label: `${data.groom}'s family`, names: `${data.groom} & ${data.bride}` },
+    { side: "bride", event: "wedding", label: `${data.bride}'s family`, names: `${data.bride} & ${data.groom}` },
+  ];
+  if (hasReception(data)) {
+    rows.push(...rows.map((r) => ({ ...r, event: "reception", label: `Reception · ${r.label}` })));
+  }
+  return rows.map((r) => ({ ...r, path: viewPath(slug, r.side, r.event) }));
+}
+
+function ShareLinks({ data, slug, origin, token, published }) {
+  const rows = linksFor(data, slug);
+  return (
+    <details className="more-links" open={published}>
+      <summary>{published ? "Family & reception links" : "Preview each version"}</summary>
+      <ul>
+        {rows.map((r) => {
+          const url = `${origin}${r.path}`;
+          const msg = r.event === "reception"
+            ? `You're invited to our wedding reception! 💛\n${r.names}\n${url}`
+            : `You're invited! 💛\n${r.names}\n${url}`;
+          const previewHref = `/preview/${token}?side=${r.side}${r.event === "reception" ? "&event=reception" : ""}`;
+          return (
+            <li key={r.path}>
+              <span className="ml-label">{r.label}</span>
+              {published ? (
+                <span className="ml-actions">
+                  <CopyBtn text={url} />
+                  <a className="btn ghost" href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer">WhatsApp</a>
+                  <a className="btn ghost" href={r.path} target="_blank" rel="noreferrer" aria-label={`Open ${r.label}`}><ExternalLink size={14} /></a>
+                </span>
+              ) : (
+                <a className="btn ghost" href={previewHref} target="_blank" rel="noreferrer"><Eye size={14} /> Preview</a>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      {!hasReception(data) && <p className="share-note">Add a reception below to get reception-only links too.</p>}
+    </details>
   );
 }
 
@@ -136,6 +184,7 @@ export default function EditPage({ params }) {
                   Open invitation <ExternalLink size={14} />
                 </Link>
               </div>
+              <ShareLinks data={data} slug={inv.slug} origin={origin} token={token} published />
               {inv.expiresAt && (
                 <p className="share-note">
                   Stays live until {new Date(inv.expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}.
@@ -159,6 +208,7 @@ export default function EditPage({ params }) {
                   <Eye size={15} /> Preview invitation
                 </Link>
               </div>
+              <ShareLinks data={data} slug={inv.slug} origin={origin} token={token} published={false} />
               <PublishPanel token={token} currentPlan={null} onPublished={onPublished} />
             </div>
           )}

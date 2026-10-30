@@ -290,3 +290,24 @@ body:has(.mm-root) { background: #FFF8EC; }
   .mm-root .petals { display: none; }
   .mm-procession { left: 50%; transform: translateX(-50%); }
 }
+
+/* ---------- blessings, story chapters, family (shared ix-* markup) ---------- */
+.mm-root .mm-blessing { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 2px; }
+.mm-root .ix-bl { color: var(--sindoor); font-size: 15px; }
+.mm-root .ix-bl-ganesh { font-family: var(--f-deva), serif; }
+.mm-root .ix-bl-ikonkar { font-family: var(--f-gurmukhi), serif; font-size: 24px; line-height: 1; }
+.mm-root .mm-tagline { margin-top: 12px; font-family: var(--f-script), cursive; font-size: 24px; color: var(--sindoor); }
+.mm-root .mm-seal-kind { font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--ink-soft); margin: -2px 0 6px; }
+.mm-root .mm-story-intro { font-family: var(--f-display), serif; font-size: 22px; margin: 26px 0 6px; }
+.mm-root .mm-journey { font-weight: 800; letter-spacing: 2px; text-transform: uppercase; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 8px; }
+.mm-root .ix-chapters { list-style: none; padding: 0; display: grid; gap: 16px; margin-top: 18px; text-align: left; }
+.mm-root .ix-chapter { background: #fff; border: 2px solid var(--ink); border-radius: 22px; box-shadow: 4px 4px 0 var(--marigold); padding: 16px 18px; }
+.mm-root .ix-ch-step { font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--rani); }
+.mm-root .ix-ch-title { font-size: 22px; margin: 2px 0 6px; }
+.mm-root .ix-ch-text { color: var(--ink-soft); line-height: 1.65; }
+.mm-root .ix-family { display: grid; gap: 14px; }
+.mm-root .ix-fam-row, .mm-root .ix-contacts { display: flex; flex-direction: column; gap: 3px; background: #fff; border: 2px solid var(--ink); border-radius: 20px; box-shadow: 4px 4px 0 var(--rani); padding: 14px 16px; }
+.mm-root .ix-fam-role { font-size: 11.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--sindoor); margin-bottom: 4px; }
+.mm-root .ix-fam-names { font-family: var(--f-display), serif; font-size: 18px; }
+.mm-root .ix-contact { display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 6px 0; text-decoration: none; font-weight: 700; }
+.mm-root .ix-contact b { color: var(--sindoor); }

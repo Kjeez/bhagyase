@@ -2006,3 +2006,78 @@ body:has(.rx) { background: #1a0710; }
   .rx .ganesha path,
   .rx .hero-arch path { transition: none; stroke-dashoffset: 0; }
 }
+
+/* Options shared by every template: blessings, tagline, story chapters */
+.rx .hero-onkar {
+  display: block;
+  font-family: var(--f-gurmukhi), serif;
+  font-size: 46px;
+  line-height: 1;
+  margin: 0 auto 10px;
+  background: linear-gradient(180deg, #fbe7ae, #d4a24c 60%, #b8862e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 10px rgba(240, 200, 120, 0.35));
+}
+.rx .hero-tagline {
+  margin-top: 14px;
+  font-style: italic;
+  font-size: 16px;
+  color: #f4dca6;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+}
+.rx.revealed .hero-copy > :nth-child(7) { transition-delay: 1.7s; }
+.rx .ix-verse + .ix-verse {
+  margin-top: 14px;
+}
+.rx .ix-verse-ikonkar {
+  font-family: var(--f-gurmukhi), serif;
+}
+.rx .journey {
+  font-family: var(--rf-cinzel), "Cinzel", serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--champagne);
+  margin: -6px 0 22px;
+}
+.rx .story {
+  list-style: none;
+  padding: 0;
+  margin: 8px auto 0;
+  max-width: 360px;
+}
+.rx .ix-chapter {
+  position: relative;
+  padding: 0 0 26px;
+}
+.rx .ix-chapter + .ix-chapter::before {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 26px;
+  margin: 0 auto 18px;
+  background: linear-gradient(transparent, rgba(236, 201, 143, 0.7), transparent);
+}
+.rx .ix-ch-step {
+  display: block;
+  font-family: var(--rf-cinzel), "Cinzel", serif;
+  font-size: 10px;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: #d9a9b0;
+}
+.rx .ix-ch-title {
+  font-family: var(--rf-script), "Pinyon Script", cursive;
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.15;
+  color: var(--champagne);
+  margin: 4px 0 6px;
+}
+.rx .ix-ch-text {
+  font-size: 17px;
+  line-height: 1.6;
+  color: rgba(255, 244, 236, 0.92);
+}

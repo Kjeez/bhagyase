@@ -13,7 +13,8 @@ import {
   Toran, FairyLights, Arch, Rangoli, Bride, Groom, Kid, Dadi, DholWala, Chacha, GroomOnGhodi,
   HaldiScene, MehendiScene, SangeetScene, BaraatScene, PherasScene, ReceptionScene,
 } from "@/components/landing/Art";
-import { RevealRoot, PetalRain, LoadBurst, DholEgg, LiveCountdown } from "@/components/landing/Motion";
+import { RevealRoot, PetalRain, LoadBurst, DholEgg } from "@/components/landing/Motion";
+import HeartboundPhone from "@/components/HeartboundPhone";
 
 export const metadata = {
   title: "WebAlchemy Invites — Joyful Animated Wedding Invitations, Shared on WhatsApp",
@@ -63,23 +64,12 @@ const FAQ = [
   ["What's your refund policy?", "Full refund within 48 hours of payment if your invitation hasn't received any RSVPs yet. See the refund policy for everything else."],
 ];
 
+// The landing-page mockups show the demo couple's Heartbound invitation.
 function Phone({ className = "" }) {
   return (
-    <div className={`phone ${className}`} aria-hidden="true">
-      <div className="phone-in">
-        <div className="phone-screen">
-          <div className="phone-notch" />
-          <span className="ph-eyebrow">We joyfully invite you to the wedding of</span>
-          <span className="ph-name">{DEMO_DATA.groom}</span>
-          <span className="ph-amp">&amp;</span>
-          <span className="ph-name">{DEMO_DATA.bride}</span>
-          <span className="ph-line">Sunday, 6 December 2026</span>
-          <div className="ph-rule"><i /><b /><i /></div>
-          <LiveCountdown iso={DEMO_DATA.dateISO} />
-          <div className="ph-scratch">✦ Scratch to reveal ✦</div>
-        </div>
-      </div>
-    </div>
+    <HeartboundPhone data={DEMO_DATA} className={className} aria-hidden="true">
+      <span className="hbm-chip">♥ Tap the seal to open ♥</span>
+    </HeartboundPhone>
   );
 }
 
@@ -214,13 +204,13 @@ export default function Landing() {
           <div className="wrap demo-grid">
             <div className="demo-phone reveal">
               <Phone className="big" />
-              <span className="tap-hint">Tap to scratch ✦</span>
+              <span className="tap-hint">The Heartbound design ✦</span>
             </div>
             <div className="demo-copy reveal">
               <p className="eyebrow">देखिए ज़रा</p>
               <h2>See a real invitation</h2>
               <p>
-                Aarav &amp; Meher&apos;s invitation is fully working: scratch the gold card, watch the
+                Aarav &amp; Meher&apos;s invitation is fully working: tap the heart seal, watch the
                 countdown, open the map, try the RSVP form. This is exactly what your guests will get.
               </p>
               <Link href="/invite/demo" className="cta">Open the live demo →</Link>
@@ -234,10 +224,11 @@ export default function Landing() {
             <div className="sec-head reveal">
               <p className="eyebrow">अपना अंदाज़</p>
               <h2>Pick your style</h2>
-              <p>Three designs ready today — switch between them any time. More hand-crafted styles are on their way.</p>
+              <p>Four designs ready today — switch between them any time. More hand-crafted styles are on their way.</p>
             </div>
             <div className="tpl-grid">
               {[
+                ["heartbound", "t-heart", "Heartbound", "A love letter with a heart-shaped seal, a moonlit sky and marigold strings."],
                 ["marigold-mela", "t-mela", "Marigold Mela", "Ivory, marigold and rani pink — curtains, dancing family, the most festive one."],
                 ["royal-palace", "t-royal", "Royal Palace", "A wax-sealed envelope that opens onto a moonlit palace."],
                 ["emerald-noir", "t-noir", "Emerald Noir", "Black, gold and candlelight elegance."],
@@ -247,15 +238,6 @@ export default function Landing() {
                   <div className="tpl-meta"><b>{name}</b><span className="tag live">See it live</span></div>
                   <p>{d}</p>
                 </Link>
-              ))}
-              {[
-                ["t-pastel", "Pastel Mehendi", "Sage, blush and delicate henna lines."],
-              ].map(([cls, name, d], i) => (
-                <div key={cls} className="tpl-card soon reveal" style={{ transitionDelay: `${(i + 3) * 80}ms` }} aria-disabled="true">
-                  <div className={`tpl-thumb ${cls}`}><span className="tpl-names">Aarav<br />&amp;<br />Meher</span></div>
-                  <div className="tpl-meta"><b>{name}</b><span className="tag">Coming soon</span></div>
-                  <p>{d}</p>
-                </div>
               ))}
             </div>
           </div>

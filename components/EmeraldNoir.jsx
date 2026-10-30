@@ -5,7 +5,10 @@ import {
   Car, Building2, Gift, Mail, Send, Check, Heart,
 } from "lucide-react";
 import "./emerald-noir.css";
-import { useCountdown, useReveal, ScratchCard, Slideshow, useRsvp, useMusic } from "./invite/shared";
+import { fmtDate, fmtTime, useCountdown, useReveal, ScratchCard, Slideshow, useRsvp, useMusic } from "./invite/shared";
+import { BlessingLines, StoryChapters, FamilyBlock } from "./invite/extras";
+import { viewOf, viaNote } from "@/lib/inviteView";
+import { gurmukhiFont } from "@/lib/fonts";
 
 /* ------------------------ decorative pieces ----------------------- */
 
@@ -55,14 +58,15 @@ function SecHead({ icon: Icon, title }) {
 
 /* ------------------------------ main ------------------------------ */
 
-export default function EmeraldNoir({ data, slug, preview = false }) {
-  const { rsvp, set, sent, sending, submit } = useRsvp(slug, preview);
+export default function EmeraldNoir({ data, slug, preview = false, side = "both", event = "wedding" }) {
+  const view = viewOf(data, side, event);
+  const { rsvp, set, sent, sending, submit } = useRsvp(slug, preview, viaNote(view));
   const music = useMusic();
-  const cd = useCountdown(data.dateISO);
+  const cd = useCountdown(view.dateISO);
   useReveal(".en-root");
 
   return (
-    <div className="en-root">
+    <div className={`en-root ${gurmukhiFont}`}>
       <svg className="corner tl" viewBox="0 0 120 120" aria-hidden="true"><path d="M118 6 C 60 10, 14 44, 8 116" stroke="var(--en-gold-dim)" fill="none" /><path d="M100 14 C 60 20, 26 50, 18 100" stroke="var(--en-gold-faint)" fill="none" /></svg>
       <svg className="corner br" viewBox="0 0 120 120" aria-hidden="true"><path d="M2 114 C 60 110, 106 76, 112 4" stroke="var(--en-gold-dim)" fill="none" /><path d="M20 106 C 60 100, 94 70, 102 20" stroke="var(--en-gold-faint)" fill="none" /></svg>
 
@@ -78,23 +82,24 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
       <main className="page">
         {/* HERO */}
         <header className="hero">
+          <BlessingLines view={view} className="en-blessing rv" />
           <DiamondRule />
-          <p className="eyebrow rv">We are honoured to welcome you to the wedding ceremony of..</p>
+          <p className="eyebrow rv">
+            We are honoured to welcome you to the {view.isReception ? "wedding reception" : "wedding ceremony"} of..
+          </p>
 
-          <h1 className="name rv">{data.groom}</h1>
-          {data.groomParents && <p className="line rv">{data.groomParents}</p>}
-          {data.groomLine1 && <p className="line rv">{data.groomLine1}</p>}
-          {data.groomLine2 && <p className="line rv">{data.groomLine2}</p>}
-
-          <DiamondRule />
-
-          <h1 className="name rv">{data.bride}</h1>
-          {data.brideParents && <p className="line rv">{data.brideParents}</p>}
-          {data.brideLine1 && <p className="line rv">{data.brideLine1}</p>}
-          {data.brideLine2 && <p className="line rv">{data.brideLine2}</p>}
+          {view.couple.map((p, i) => (
+            <div key={p.who}>
+              {i > 0 && <DiamondRule />}
+              <h1 className="name rv">{p.name}</h1>
+              {p.parents && <p className="line rv">{p.parents}</p>}
+              {p.lines.map((l) => <p key={l} className="line rv">{l}</p>)}
+            </div>
+          ))}
 
           <div className="dotline" aria-hidden="true"><i /><b /><i /></div>
           <p className="request rv">Request the honour of your presence</p>
+          {view.tagline && <p className="tagline rv">{view.tagline}</p>}
 
           <DiamondRule />
           <p className="scroll-lab">Scroll</p>
@@ -117,7 +122,7 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
         {data.show.scratch && (
           <section className="sec">
             <SecHead title="Scratch to Reveal" />
-            <ScratchCard dateISO={data.dateISO} />
+            <ScratchCard dateISO={view.dateISO} />
           </section>
         )}
 
@@ -126,6 +131,16 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
           <section className="sec">
             <HeartRule />
             <Slideshow photos={data.photos} />
+          </section>
+        )}
+
+        {/* STORY */}
+        {view.chapters.length > 0 && (
+          <section className="sec">
+            <SecHead title="Our Story" />
+            {data.storyIntro && <p className="story-intro rv">{data.storyIntro}</p>}
+            {view.journey.length > 0 && <p className="journey rv">{view.journey.join("  ·  ")}</p>}
+            <StoryChapters view={view} className="en-chapters" />
           </section>
         )}
 
@@ -149,7 +164,7 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
         )}
 
         {/* TIMELINE */}
-        {data.show.timeline && data.timeline.some((t) => t.title) && (
+        {!view.isReception && data.show.timeline && data.timeline.some((t) => t.title) && (
           <section className="sec">
             <SecHead icon={Clock} title="Program Timeline" />
             <div className="tl rv">
@@ -168,17 +183,35 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
         )}
 
         {/* VENUE */}
-        {data.venueName && (
+        {view.venue.name && (
           <section className="sec">
-            <SecHead icon={MapPin} title="Venue" />
-            <p className="venue-name rv">{data.venueName}</p>
-            {data.venueAddress && <p className="venue-addr rv">{data.venueAddress}</p>}
+            <SecHead icon={MapPin} title={view.isReception ? "Reception Venue" : "Venue"} />
+            <p className="venue-name rv">{view.venue.name}</p>
+            {view.venue.address && <p className="venue-addr rv">{view.venue.address}</p>}
             <PalaceArt />
-            {data.mapsUrl && (
-              <a className="btn-gold rv" href={data.mapsUrl} target="_blank" rel="noreferrer">
+            {view.venue.maps && (
+              <a className="btn-gold rv" href={view.venue.maps} target="_blank" rel="noreferrer">
                 View on Google Maps
               </a>
             )}
+          </section>
+        )}
+
+        {/* RECEPTION (on the full invite) */}
+        {!view.isReception && view.reception?.venueName && (
+          <section className="sec">
+            <SecHead icon={PartyPopper} title="Reception" />
+            <p className="venue-name rv">{view.reception.venueName}</p>
+            {view.reception.venueAddress && <p className="venue-addr rv">{view.reception.venueAddress}</p>}
+            <p className="venue-addr rv">{fmtDate(view.reception.dateISO)} · {fmtTime(view.reception.dateISO)} onwards</p>
+            <a
+              className="btn-gold rv"
+              href={view.reception.mapsUrl || `https://maps.google.com/?q=${encodeURIComponent(`${view.reception.venueName} ${view.reception.venueAddress}`)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View on Google Maps
+            </a>
           </section>
         )}
 
@@ -194,7 +227,7 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
         )}
 
         {/* PRE-WEDDING */}
-        {data.show.preEvents && data.preEvents.some((e) => e.title && e.when) && (
+        {!view.isReception && data.show.preEvents && data.preEvents.some((e) => e.title && e.when) && (
           <section className="sec">
             <SecHead icon={PartyPopper} title="Pre-Wedding Events" />
             <div className="pre rv">
@@ -233,6 +266,14 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
           </section>
         )}
 
+        {/* FAMILY & CONTACTS */}
+        {(view.familyRows.length > 0 || view.contacts.length > 0) && (
+          <section className="sec">
+            <SecHead title="With Love & Blessings" />
+            <FamilyBlock view={view} className="en-family" />
+          </section>
+        )}
+
         {/* RSVP */}
         {data.show.rsvp && (
           <section className="sec">
@@ -268,12 +309,12 @@ export default function EmeraldNoir({ data, slug, preview = false }) {
         <section className="sec closing">
           <Flourish />
           <p className="script close-line rv">{data.closing}</p>
-          <p className="script close-names rv">{data.groom} &amp; {data.bride}</p>
+          <p className="script close-names rv">{view.names}</p>
           <Flourish />
         </section>
 
         <footer className="foot">
-          <span className="script foot-names">{data.groom} &amp; {data.bride}</span>
+          <span className="script foot-names">{view.names}</span>
           <span className="foot-brand">
             Created with <a href="/"><b>WebAlchemy Invites</b></a> · Create your own wedding invitation
           </span>

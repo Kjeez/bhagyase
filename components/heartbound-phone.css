@@ -1,0 +1,244 @@
+/* Heartbound cover inside the phone mockup (landing page and editor preview) */
+.phone-screen.hbm {
+  justify-content: flex-start;
+  gap: 0;
+  padding: 0;
+  background: #2a0613;
+  color: #fff;
+  isolation: isolate;
+}
+.hbm-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 44% 30%;
+  z-index: -2;
+  animation: hbm-drift 18s ease-in-out infinite alternate;
+}
+.hbm-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(91, 11, 31, 0.16), rgba(91, 11, 31, 0.16)),
+    linear-gradient(rgba(22, 4, 12, 0.55) 0%, rgba(30, 5, 16, 0.2) 34%, rgba(40, 6, 20, 0.3) 56%, rgba(51, 8, 24, 0.86) 80%, #5b0b1f 100%);
+}
+@keyframes hbm-drift {
+  from { transform: scale(1.04); }
+  to { transform: scale(1.12) translateY(-2%); }
+}
+
+/* marigold strings */
+.hbm .garland {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 22%;
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+.hbm .garland-strand {
+  transform-box: view-box;
+  transform-origin: 50% 0;
+  animation: hbm-sway 6s ease-in-out infinite alternate;
+  animation-delay: calc(var(--gi) * -2.3s);
+}
+.hbm .garland-back { opacity: 0.55; }
+.hbm .garland-thread { fill: none; stroke: #c99a4a; stroke-width: 0.8; }
+.hbm .garland-bead { fill: #f3d58f; }
+.hbm .garland-bell { fill: #d4a24c; }
+@keyframes hbm-sway {
+  from { transform: rotate(-0.8deg); }
+  to { transform: rotate(0.8deg); }
+}
+
+.hbm-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 23% 14px 0;
+  text-align: center;
+}
+.hbm-onkar {
+  font-family: var(--f-gurmukhi), serif;
+  font-size: 26px;
+  line-height: 1;
+  color: #f4d48e;
+  text-shadow: 0 0 10px rgba(240, 200, 120, 0.45);
+}
+.hbm-kicker {
+  font-family: var(--rf-deva), "Tiro Devanagari Sanskrit", serif;
+  font-size: 10px;
+  color: #f4dca6;
+}
+.hbm-pre {
+  font-family: var(--rf-cinzel), "Cinzel", serif;
+  font-size: 7.5px;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: #f0cfa2;
+}
+.hbm-names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--rf-script), "Pinyon Script", cursive;
+  font-size: 38px;
+  line-height: 0.95;
+  margin: 2px 0;
+  text-shadow: 0 2px 14px rgba(20, 0, 10, 0.6);
+  overflow-wrap: anywhere;
+}
+.hbm-names > span:not(.hbm-amp) {
+  background: linear-gradient(100deg, #fff 0%, #fff 42%, #f6d9a6 50%, #fff 58%, #fff 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding: 0.12em 0.1em;
+  margin: -0.12em 0;
+  animation: hbm-shimmer 6s ease-in-out infinite;
+}
+.hbm-names > span:last-child { animation-delay: 0.4s; }
+.hbm-amp {
+  font-size: 0.55em;
+  color: #f0cfa2;
+}
+@keyframes hbm-shimmer {
+  0% { background-position: 120% 0; }
+  45%, 100% { background-position: -20% 0; }
+}
+.hbm-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--rf-cinzel), "Cinzel", serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #fff;
+}
+.hbm-date i {
+  width: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #f3d9a8);
+}
+.hbm-date i:last-child { background: linear-gradient(270deg, transparent, #f3d9a8); }
+.hbm-tag {
+  font-family: var(--rf-body), "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 12px;
+  color: #f3dcae;
+}
+.hbm .ph-cd { margin-top: 4px; gap: 4px; }
+.hbm .ph-cd span {
+  min-width: 34px;
+  padding: 5px 4px;
+  font-family: var(--rf-cinzel), "Cinzel", serif;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(63, 6, 20, 0.6);
+  border: 1px solid rgba(240, 207, 162, 0.35);
+  border-radius: 4px;
+  backdrop-filter: blur(2px);
+}
+.hbm .ph-cd span i { color: #f0cfa2; font-size: 6.5px; }
+
+/* temple skyline drawn in gold along the bottom */
+.hbm-art {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 29%;
+  z-index: 1;
+  pointer-events: none;
+}
+.hbm .skyline {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 4px rgba(240, 200, 130, 0.3));
+}
+.hbm .sk-far path,
+.hbm .sk-near path {
+  fill: none;
+  stroke: url(#sk-gold);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: hbm-draw 2.4s cubic-bezier(0.5, 0.1, 0.3, 1) forwards;
+  animation-delay: calc(0.3s + var(--i) * 0.03s);
+}
+.hbm .sk-far path { stroke-width: 0.9; opacity: 0.42; }
+.hbm .sk-ghost path { stroke-width: 0.55; opacity: 0.4; }
+.hbm .sk-fill path { fill: #1f050e; opacity: 0.9; }
+.hbm .sk-flag {
+  fill: #ec8a2e;
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  animation: hbm-flag 1.8s ease-in-out infinite alternate;
+}
+@keyframes hbm-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes hbm-flag {
+  from { transform: scaleX(1) skewY(0deg); }
+  to { transform: scaleX(0.88) skewY(-7deg); }
+}
+
+/* small extras under the countdown */
+.hbm-chip {
+  margin-top: 4px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-family: var(--rf-cinzel), "Cinzel", serif;
+  font-size: 8.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #3a2c08;
+  background: linear-gradient(120deg, #b8892c, #f3d98a, #c99a3b, #f6e3a4);
+  background-size: 200% 100%;
+  animation: hbm-foil 3s linear infinite;
+}
+@keyframes hbm-foil {
+  from { background-position: 0 0; }
+  to { background-position: 200% 0; }
+}
+.hbm-line {
+  font-family: var(--rf-body), "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 11.5px;
+  color: #f3e4e0;
+}
+.hbm-fns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  max-width: 200px;
+}
+.hbm-fns span {
+  font-family: var(--rf-cinzel), "Cinzel", serif;
+  font-size: 7.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #f0cfa2;
+  border: 1px solid rgba(240, 207, 162, 0.4);
+  border-radius: 20px;
+  padding: 3px 7px;
+  background: rgba(63, 6, 20, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hbm-photo, .hbm .garland-strand, .hbm-names > span, .hbm .sk-flag, .hbm-chip { animation: none; }
+  .hbm .sk-far path, .hbm .sk-near path { animation: none; stroke-dashoffset: 0; }
+}
