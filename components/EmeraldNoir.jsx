@@ -139,6 +139,7 @@ export default function EmeraldNoir({ data, slug, preview = false, side = "both"
           <section className="sec">
             <SecHead title="Our Story" />
             {data.storyIntro && <p className="story-intro rv">{data.storyIntro}</p>}
+            {view.storyIntroSub && <p className="journey rv">{view.storyIntroSub}</p>}
             {view.journey.length > 0 && <p className="journey rv">{view.journey.join("  ·  ")}</p>}
             <StoryChapters view={view} className="en-chapters" />
           </section>

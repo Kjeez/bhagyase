@@ -1004,6 +1004,7 @@ export default function RoyalPalace({ data, slug, preview = false, side = "both"
           <section className="sec wine">
             <Tear seed={5} tone="wine" />
             <Title>{data.storyIntro || "Our Story"}</Title>
+            {view.storyIntroSub && <p className="journey rv">{view.storyIntroSub}</p>}
             {view.journey.length > 0 && <p className="journey rv">{view.journey.join("  ·  ")}</p>}
             {photos.length > 0 && (
               <div className="frames rv rv-none">
@@ -1029,7 +1030,7 @@ export default function RoyalPalace({ data, slug, preview = false, side = "both"
             {[
               ...view.familyRows,
               ...guestInfo,
-              ["With Best Compliments", "All Near & Dear Ones"],
+              view.compliments && ["With Best Compliments", view.compliments],
             ]
               .filter(Boolean)
               .map(([role, names], i) => (
@@ -1121,7 +1122,7 @@ export default function RoyalPalace({ data, slug, preview = false, side = "both"
 
           <div className="finale rv rv-none">
             <Sparkles count={18} />
-            <p className="script finale-hope">{data.closing || "Hope to see you there!"}</p>
+            <p className="script finale-hope">{view.punjabi ? "Tuhaadi udeek rahegi" : data.closing || "Hope to see you there!"}</p>
             <p className="finale-names">{view.names}</p>
           </div>
         </section>

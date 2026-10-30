@@ -58,7 +58,7 @@ export function FamilyBlock({ view, className = "" }) {
   if (!view.familyRows.length && !view.contacts.length) return null;
   return (
     <div className={`ix-family ${className}`}>
-      {view.familyRows.map(([role, names]) => (
+      {[...view.familyRows, ...(view.familyRows.length && view.compliments ? [["With Best Compliments", view.compliments]] : [])].map(([role, names]) => (
         <div key={role} className="ix-fam-row rv">
           <span className="ix-fam-role">{role}</span>
           {names.split("\n").map((line) => (

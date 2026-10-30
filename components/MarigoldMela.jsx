@@ -176,6 +176,7 @@ export default function MarigoldMela({ data, slug, preview = false, side = "both
               <div className="mm-polaroid rv"><Slideshow photos={data.photos} /></div>
             )}
             {data.storyIntro && <p className="mm-story-intro rv">{data.storyIntro}</p>}
+            {view.storyIntroSub && <p className="mm-journey rv">{view.storyIntroSub}</p>}
             {view.journey.length > 0 && <p className="mm-journey rv">{view.journey.join("  ✿  ")}</p>}
             <StoryChapters view={view} className="mm-chapters" />
           </Sec>

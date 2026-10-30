@@ -1052,7 +1052,7 @@ export default function Heartbound({ data, slug, preview = false, side = "both",
     data.show.stay && data.accommodation && ["Where to Stay", data.accommodation],
     data.show.gifts && data.giftsNote && ["Gifts", data.giftsNote],
   ].filter(Boolean);
-  const family = [...view.familyRows, ...guestInfo, ["With Best Compliments", "All Near & Dear Ones"]];
+  const family = [...view.familyRows, ...guestInfo, view.compliments && ["With Best Compliments", view.compliments]].filter(Boolean);
 
   return (
     <div ref={rootRef} className={`hx inv ${royalFonts} ${revealed ? "revealed" : ""}`} style={ROOT_STYLE}>
@@ -1156,7 +1156,7 @@ export default function Heartbound({ data, slug, preview = false, side = "both",
                       <span className="lt-cover-date">{ev.date}</span>
                     </div>
                     <div className="lt-cover-face lt-cover-back">
-                      <span className="script">Do join us in the celebration</span>
+                      <span className="script">{view.punjabi ? "Sadde viyah te zaroor aana ji" : "Do join us in the celebration"}</span>
                     </div>
                   </div>
                 </div>
@@ -1312,6 +1312,7 @@ export default function Heartbound({ data, slug, preview = false, side = "both",
             Your love and support mean the world to us, and we would be honoured to have you by our side as we
             say &ldquo;forever.&rdquo;
           </p>
+          {view.punjabi && <p className="script punjabi-line rv">Sadde viyah te zaroor aana ji</p>}
         </section>
 
         {/* =========================================================
@@ -1410,10 +1411,10 @@ export default function Heartbound({ data, slug, preview = false, side = "both",
                 ))}
               </div>
             )}
-            {(data.storyIntro || view.journey.length > 0) && (
+            {(data.storyIntro || view.storyIntroSub || view.journey.length > 0) && (
               <p className="story-intro rv rv-blur">
                 {data.storyIntro}
-                {view.journey.length > 0 && <span>{view.journey.join(" · ")}</span>}
+                {(view.storyIntroSub || view.journey.length > 0) && <span>{view.storyIntroSub || view.journey.join(" · ")}</span>}
               </p>
             )}
             <StoryRoute chapters={view.chapters} />
@@ -1488,7 +1489,14 @@ export default function Heartbound({ data, slug, preview = false, side = "both",
 
           <div className="finale rv rv-none">
             <Sparkles count={18} />
-            <p className="script finale-hope">{data.closing || "Hope to see you there!"}</p>
+            {view.punjabi ? (
+              <>
+                <p className="script finale-hope">Tuhaadi udeek rahegi</p>
+                <p className="finale-en">We&rsquo;ll be waiting for you</p>
+              </>
+            ) : (
+              <p className="script finale-hope">{data.closing || "Hope to see you there!"}</p>
+            )}
             <p className="finale-names">{names}</p>
           </div>
 

@@ -2,7 +2,7 @@
 
 import {
   Check, Heart, CalendarHeart, Camera, Clock, MapPin, Shirt, Sparkles, Car, LayoutGrid, Palette, ExternalLink,
-  Users, PartyPopper, BookHeart,
+  Users, PartyPopper, BookHeart, Plus, X,
 } from "lucide-react";
 import { TEMPLATES } from "@/lib/templates";
 import { BLESSINGS } from "@/lib/inviteView";
@@ -51,6 +51,8 @@ export default function InviteForm({ data, setData }) {
     setData((d) => ({ ...d, [arr]: d[arr].map((e, j) => (j === i ? { ...e, [k]: v } : e)) }));
   const upShow = (k) => setData((d) => ({ ...d, show: { ...d.show, [k]: !d.show[k] } }));
   const upIn = (k, sub, v) => setData((d) => ({ ...d, [k]: { ...d[k], [sub]: v } }));
+  const addRow = (arr, row) => setData((d) => ({ ...d, [arr]: [...d[arr], row] }));
+  const dropRow = (arr, i) => setData((d) => ({ ...d, [arr]: d[arr].filter((_, j) => j !== i) }));
 
   return (
     <div className="wf">
@@ -109,6 +111,23 @@ export default function InviteForm({ data, setData }) {
             </div>
           </div>
         ))}
+        <F label="With best compliments (optional)">
+          <input value={data.compliments} onChange={(e) => up("compliments", e.target.value)} placeholder="All Near & Dear Ones" />
+        </F>
+        {data.contacts.map((c, i) => (
+          <div className="wf-block" key={i}>
+            <div className="wf-row2">
+              <F label={`More contacts ${i + 1} — name`}><input value={c.name} onChange={(e) => upArr("contacts", i, "name", e.target.value)} /></F>
+              <F label="Phone"><input type="tel" value={c.phone} onChange={(e) => upArr("contacts", i, "phone", e.target.value)} placeholder="+91 98…" /></F>
+            </div>
+            <button type="button" className="wf-remove" onClick={() => dropRow("contacts", i)}><X size={13} /> Remove</button>
+          </div>
+        ))}
+        {data.contacts.length < 3 && (
+          <button type="button" className="wf-toggle wf-add" onClick={() => addRow("contacts", { name: "", phone: "" })}>
+            <Plus size={13} /> Add a contact for every link
+          </button>
+        )}
       </Card>
 
       <Card icon={CalendarHeart} title="The big day" hint="Your countdown and scratch card use this date." acc="#FFD54A">
@@ -133,13 +152,22 @@ export default function InviteForm({ data, setData }) {
       <Card icon={BookHeart} title="Your story" hint="Optional — up to four little chapters of how you got here." acc="#F7D9A8">
         <F label="Tagline under your names"><input value={data.tagline} onChange={(e) => up("tagline", e.target.value)} placeholder="From a Delhi school to forever" /></F>
         <F label="Places that shaped you (comma separated)"><input value={data.journey} onChange={(e) => up("journey", e.target.value)} placeholder="Himachal, Delhi, Punjab" /></F>
-        <F label="Story headline"><input value={data.storyIntro} onChange={(e) => up("storyIntro", e.target.value)} placeholder="Ek Punjabi Munda, Ek Pahadi Kudi" /></F>
+        <div className="wf-row2">
+          <F label="Story headline"><input value={data.storyIntro} onChange={(e) => up("storyIntro", e.target.value)} placeholder="Ek Punjabi Munda, Ek Pahadi Kudi" /></F>
+          <F label="Story sub-line"><input value={data.storyIntroSub} onChange={(e) => up("storyIntroSub", e.target.value)} placeholder="and one Delhi school" /></F>
+        </div>
         {data.storyChapters.map((c, i) => (
           <div className="wf-block" key={i}>
             <F label={`Chapter ${i + 1} title`}><input value={c.title} onChange={(e) => upArr("storyChapters", i, "title", e.target.value)} placeholder={["Where it all began", "Growing up, together", "Finding home", "And now, forever"][i]} /></F>
             <F label="What happened"><textarea rows={2} value={c.text} onChange={(e) => upArr("storyChapters", i, "text", e.target.value)} /></F>
           </div>
         ))}
+        {!data.storyChapters.some((c) => c.title?.trim() || c.text?.trim()) && (
+          <F label="Or just write it">
+            <textarea rows={3} value={data.story} onChange={(e) => up("story", e.target.value)}
+              placeholder="How you met, your first trip, the proposal… Leave a blank line between paragraphs." />
+          </F>
+        )}
       </Card>
 
       <Card icon={Camera} title="Photos & music" hint="Optional — paste links to your photos and a song." acc="#BFE4DF">
