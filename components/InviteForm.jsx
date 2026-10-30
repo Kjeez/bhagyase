@@ -1,6 +1,11 @@
 "use client";
 
-import { Check } from "lucide-react";
+import {
+  Check, Heart, CalendarHeart, Camera, Clock, MapPin, Shirt, Sparkles, Car, LayoutGrid, Palette, ExternalLink,
+  Users, PartyPopper, BookHeart, Plus, X,
+} from "lucide-react";
+import { TEMPLATES } from "@/lib/templates";
+import { BLESSINGS } from "@/lib/inviteView";
 
 function F({ label, children }) {
   return (
@@ -8,6 +13,22 @@ function F({ label, children }) {
       <span>{label}</span>
       {children}
     </label>
+  );
+}
+
+// A titled group of fields with its own accent colour.
+function Card({ icon: Icon, title, hint, acc, children }) {
+  return (
+    <section className="wf-card" style={{ "--acc": acc }}>
+      <div className="wf-card-head">
+        <span className="wf-ic"><Icon size={20} /></span>
+        <div>
+          <h2>{title}</h2>
+          {hint && <p>{hint}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
   );
 }
 
@@ -29,87 +50,197 @@ export default function InviteForm({ data, setData }) {
   const upArr = (arr, i, k, v) =>
     setData((d) => ({ ...d, [arr]: d[arr].map((e, j) => (j === i ? { ...e, [k]: v } : e)) }));
   const upShow = (k) => setData((d) => ({ ...d, show: { ...d.show, [k]: !d.show[k] } }));
+  const upIn = (k, sub, v) => setData((d) => ({ ...d, [k]: { ...d[k], [sub]: v } }));
+  const addRow = (arr, row) => setData((d) => ({ ...d, [arr]: [...d[arr], row] }));
+  const dropRow = (arr, i) => setData((d) => ({ ...d, [arr]: d[arr].filter((_, j) => j !== i) }));
 
   return (
     <div className="wf">
-      <div className="wf-sub">Couple</div>
-      <div className="wf-row2">
-        <F label="Groom *"><input value={data.groom} onChange={(e) => up("groom", e.target.value)} /></F>
-        <F label="Bride *"><input value={data.bride} onChange={(e) => up("bride", e.target.value)} /></F>
-      </div>
-      <F label="Groom — parents line"><input value={data.groomParents} onChange={(e) => up("groomParents", e.target.value)} placeholder="Son of Mr. & Mrs. Sharma" /></F>
-      <div className="wf-row2">
-        <F label="Groom extra line 1"><input value={data.groomLine1} onChange={(e) => up("groomLine1", e.target.value)} placeholder="MBBS, M.D. (optional)" /></F>
-        <F label="Groom extra line 2"><input value={data.groomLine2} onChange={(e) => up("groomLine2", e.target.value)} placeholder="(optional)" /></F>
-      </div>
-      <F label="Bride — parents line"><input value={data.brideParents} onChange={(e) => up("brideParents", e.target.value)} placeholder="Daughter of Mr. & Mrs. Kapoor" /></F>
-      <div className="wf-row2">
-        <F label="Bride extra line 1"><input value={data.brideLine1} onChange={(e) => up("brideLine1", e.target.value)} placeholder="(optional)" /></F>
-        <F label="Bride extra line 2"><input value={data.brideLine2} onChange={(e) => up("brideLine2", e.target.value)} placeholder="(optional)" /></F>
-      </div>
-      <F label="Welcome message">
-        <textarea rows={3} value={data.welcomeMsg} onChange={(e) => up("welcomeMsg", e.target.value)} />
-      </F>
-      <F label="Wedding date & time *">
-        <input type="datetime-local" value={data.dateISO} onChange={(e) => up("dateISO", e.target.value)} />
-      </F>
-      <F label="Photo URLs (comma separated)">
-        <textarea
-          rows={2}
-          value={data.photos.join(", ")}
-          placeholder="https://…jpg, https://…jpg"
-          onChange={(e) => up("photos", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))}
-        />
-      </F>
-      <F label="Music URL (mp3 — optional)">
-        <input value={data.musicUrl} onChange={(e) => up("musicUrl", e.target.value)} placeholder="https://…mp3" />
-      </F>
-
-      <div className="wf-sub">Program timeline</div>
-      {data.timeline.map((ev, i) => (
-        <div className="wf-block" key={i}>
-          <div className="wf-row2">
-            <F label={`Item ${i + 1}`}><input value={ev.title} onChange={(e) => upArr("timeline", i, "title", e.target.value)} /></F>
-            <F label="When"><input value={ev.when} onChange={(e) => upArr("timeline", i, "when", e.target.value)} placeholder="6 Dec 2026, 7:00 PM" /></F>
-          </div>
-          <F label="Note"><input value={ev.desc} onChange={(e) => upArr("timeline", i, "desc", e.target.value)} /></F>
+      <Card icon={Palette} title="Choose your style" hint="You can switch any time — your details stay the same." acc="#E0457B">
+        <div className="wf-styles" role="radiogroup" aria-label="Invitation style">
+          {Object.values(TEMPLATES).map((t) => (
+            <div key={t.id} className={`wf-style ${data.template === t.id ? "on" : ""}`}>
+              <button type="button" role="radio" aria-checked={data.template === t.id} onClick={() => up("template", t.id)}>
+                <span className="wf-swatch" aria-hidden="true">{t.swatch.map((c) => <i key={c} style={{ background: c }} />)}</span>
+                <b>{t.name}</b>
+                <span>{t.blurb}</span>
+                {data.template === t.id && <span className="wf-picked"><Check size={13} /> Selected</span>}
+              </button>
+              <a href={`/invite/demo?style=${t.id}`} target="_blank" rel="noreferrer">See a sample <ExternalLink size={12} /></a>
+            </div>
+          ))}
         </div>
-      ))}
+      </Card>
 
-      <div className="wf-sub">Venue</div>
-      <F label="Venue name"><input value={data.venueName} onChange={(e) => up("venueName", e.target.value)} /></F>
-      <F label="Address"><input value={data.venueAddress} onChange={(e) => up("venueAddress", e.target.value)} /></F>
-      <F label="Google Maps link"><input value={data.mapsUrl} onChange={(e) => up("mapsUrl", e.target.value)} placeholder="https://maps.google.com/?q=…" /></F>
-
-      <div className="wf-sub">Dress code</div>
-      <F label="Women"><input value={data.dressWomen} onChange={(e) => up("dressWomen", e.target.value)} /></F>
-      <F label="Men"><input value={data.dressMen} onChange={(e) => up("dressMen", e.target.value)} /></F>
-
-      <div className="wf-sub">Pre-wedding events</div>
-      {data.preEvents.map((ev, i) => (
-        <div className="wf-block" key={i}>
-          <div className="wf-row2">
-            <F label={`Event ${i + 1}`}><input value={ev.title} onChange={(e) => upArr("preEvents", i, "title", e.target.value)} /></F>
-            <F label="When"><input value={ev.when} onChange={(e) => upArr("preEvents", i, "when", e.target.value)} placeholder="4 Dec 2026, 8:00 PM" /></F>
-          </div>
-          <F label="Where"><input value={ev.where} onChange={(e) => upArr("preEvents", i, "where", e.target.value)} /></F>
+      <Card icon={Heart} title="The couple" hint="Names exactly as you'd like them printed." acc="#F7B7A3">
+        <div className="wf-row2">
+          <F label="Groom *"><input value={data.groom} onChange={(e) => up("groom", e.target.value)} /></F>
+          <F label="Bride *"><input value={data.bride} onChange={(e) => up("bride", e.target.value)} /></F>
         </div>
-      ))}
+        <F label="Groom — parents line"><input value={data.groomParents} onChange={(e) => up("groomParents", e.target.value)} placeholder="Son of Mr. & Mrs. Sharma" /></F>
+        <div className="wf-row2">
+          <F label="Groom extra line 1"><input value={data.groomLine1} onChange={(e) => up("groomLine1", e.target.value)} placeholder="MBBS, M.D. (optional)" /></F>
+          <F label="Groom extra line 2"><input value={data.groomLine2} onChange={(e) => up("groomLine2", e.target.value)} placeholder="(optional)" /></F>
+        </div>
+        <F label="Bride — parents line"><input value={data.brideParents} onChange={(e) => up("brideParents", e.target.value)} placeholder="Daughter of Mr. & Mrs. Kapoor" /></F>
+        <div className="wf-row2">
+          <F label="Bride extra line 1"><input value={data.brideLine1} onChange={(e) => up("brideLine1", e.target.value)} placeholder="(optional)" /></F>
+          <F label="Bride extra line 2"><input value={data.brideLine2} onChange={(e) => up("brideLine2", e.target.value)} placeholder="(optional)" /></F>
+        </div>
+      </Card>
 
-      <div className="wf-sub">Guest info</div>
-      <F label="Transportation"><textarea rows={2} value={data.transport} onChange={(e) => up("transport", e.target.value)} /></F>
-      <F label="Accommodation"><textarea rows={2} value={data.accommodation} onChange={(e) => up("accommodation", e.target.value)} /></F>
-      <F label="Gifts note"><textarea rows={2} value={data.giftsNote} onChange={(e) => up("giftsNote", e.target.value)} /></F>
-      <F label="Closing line"><input value={data.closing} onChange={(e) => up("closing", e.target.value)} /></F>
-
-      <div className="wf-sub">Sections</div>
-      <div className="wf-toggles">
-        {Object.entries(SECTION_LABELS).map(([k, label]) => (
-          <button type="button" key={k} className={`wf-toggle ${data.show[k] ? "on" : ""}`} onClick={() => upShow(k)}>
-            {data.show[k] && <Check size={13} />} {label}
-          </button>
+      <Card icon={Users} title="Families & blessings"
+        hint="Each family gets its own link that shows their names first, their elders and their contact." acc="#E7C6F0">
+        {[["groom", "Groom's family", "Late Smt. & Sh. Saib"], ["bride", "Bride's family", "Smt. & Sh. Sharma"]].map(([who, label, gp]) => (
+          <div className="wf-block" key={who}>
+            <b className="wf-block-title">{label}</b>
+            <F label="Blessing at the top">
+              <select value={data.blessing[who]} onChange={(e) => upIn("blessing", who, e.target.value)}>
+                {Object.entries(BLESSINGS).map(([id, b]) => <option key={id} value={id}>{b.label}</option>)}
+              </select>
+            </F>
+            <F label="Grandparents (optional)">
+              <input value={data[`${who}Grandparents`]} onChange={(e) => up(`${who}Grandparents`, e.target.value)} placeholder={gp} />
+            </F>
+            <F label="Family name (optional)">
+              <input value={data[`${who}Family`]} onChange={(e) => up(`${who}Family`, e.target.value)} placeholder={who === "groom" ? "Saib & Rooprai Family" : "Sharma Parivar"} />
+            </F>
+            <div className="wf-row2">
+              <F label="Contact person"><input value={data[`${who}Contact`].name} onChange={(e) => upIn(`${who}Contact`, "name", e.target.value)} placeholder="Name" /></F>
+              <F label="Contact phone"><input type="tel" value={data[`${who}Contact`].phone} onChange={(e) => upIn(`${who}Contact`, "phone", e.target.value)} placeholder="+91 98…" /></F>
+            </div>
+          </div>
         ))}
-      </div>
+        <F label="With best compliments (optional)">
+          <input value={data.compliments} onChange={(e) => up("compliments", e.target.value)} placeholder="All Near & Dear Ones" />
+        </F>
+        {data.contacts.map((c, i) => (
+          <div className="wf-block" key={i}>
+            <div className="wf-row2">
+              <F label={`More contacts ${i + 1} — name`}><input value={c.name} onChange={(e) => upArr("contacts", i, "name", e.target.value)} /></F>
+              <F label="Phone"><input type="tel" value={c.phone} onChange={(e) => upArr("contacts", i, "phone", e.target.value)} placeholder="+91 98…" /></F>
+            </div>
+            <button type="button" className="wf-remove" onClick={() => dropRow("contacts", i)}><X size={13} /> Remove</button>
+          </div>
+        ))}
+        {data.contacts.length < 3 && (
+          <button type="button" className="wf-toggle wf-add" onClick={() => addRow("contacts", { name: "", phone: "" })}>
+            <Plus size={13} /> Add a contact for every link
+          </button>
+        )}
+      </Card>
+
+      <Card icon={CalendarHeart} title="The big day" hint="Your countdown and scratch card use this date." acc="#FFD54A">
+        <F label="Welcome message">
+          <textarea rows={3} value={data.welcomeMsg} onChange={(e) => up("welcomeMsg", e.target.value)} />
+        </F>
+        <F label="Wedding date & time *">
+          <input type="datetime-local" value={data.dateISO} onChange={(e) => up("dateISO", e.target.value)} />
+        </F>
+      </Card>
+
+      <Card icon={PartyPopper} title="Reception (optional)"
+        hint="Add a reception and you get a separate reception-only link to share." acc="#BFD7F2">
+        <F label="Reception date & time">
+          <input type="datetime-local" value={data.reception.dateISO} onChange={(e) => upIn("reception", "dateISO", e.target.value)} />
+        </F>
+        <F label="Venue name"><input value={data.reception.venueName} onChange={(e) => upIn("reception", "venueName", e.target.value)} /></F>
+        <F label="Address"><input value={data.reception.venueAddress} onChange={(e) => upIn("reception", "venueAddress", e.target.value)} /></F>
+        <F label="Google Maps link"><input value={data.reception.mapsUrl} onChange={(e) => upIn("reception", "mapsUrl", e.target.value)} placeholder="https://maps.google.com/?q=…" /></F>
+      </Card>
+
+      <Card icon={BookHeart} title="Your story" hint="Optional — up to four little chapters of how you got here." acc="#F7D9A8">
+        <F label="Tagline under your names"><input value={data.tagline} onChange={(e) => up("tagline", e.target.value)} placeholder="From a Delhi school to forever" /></F>
+        <F label="Places that shaped you (comma separated)"><input value={data.journey} onChange={(e) => up("journey", e.target.value)} placeholder="Himachal, Delhi, Punjab" /></F>
+        <div className="wf-row2">
+          <F label="Story headline"><input value={data.storyIntro} onChange={(e) => up("storyIntro", e.target.value)} placeholder="Ek Punjabi Munda, Ek Pahadi Kudi" /></F>
+          <F label="Story sub-line"><input value={data.storyIntroSub} onChange={(e) => up("storyIntroSub", e.target.value)} placeholder="and one Delhi school" /></F>
+        </div>
+        {data.storyChapters.map((c, i) => (
+          <div className="wf-block" key={i}>
+            <F label={`Chapter ${i + 1} title`}><input value={c.title} onChange={(e) => upArr("storyChapters", i, "title", e.target.value)} placeholder={["Where it all began", "Growing up, together", "Finding home", "And now, forever"][i]} /></F>
+            <F label="What happened"><textarea rows={2} value={c.text} onChange={(e) => upArr("storyChapters", i, "text", e.target.value)} /></F>
+          </div>
+        ))}
+        {!data.storyChapters.some((c) => c.title?.trim() || c.text?.trim()) && (
+          <F label="Or just write it">
+            <textarea rows={3} value={data.story} onChange={(e) => up("story", e.target.value)}
+              placeholder="How you met, your first trip, the proposal… Leave a blank line between paragraphs." />
+          </F>
+        )}
+      </Card>
+
+      <Card icon={Camera} title="Photos & music" hint="Optional — paste links to your photos and a song." acc="#BFE4DF">
+        <F label="Photo URLs (comma separated)">
+          <textarea
+            rows={2}
+            value={data.photos.join(", ")}
+            placeholder="https://…jpg, https://…jpg"
+            onChange={(e) => up("photos", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))}
+          />
+        </F>
+        <F label="Music URL (mp3 — optional)">
+          <input value={data.musicUrl} onChange={(e) => up("musicUrl", e.target.value)} placeholder="https://…mp3" />
+        </F>
+
+      </Card>
+
+      <Card icon={Clock} title="Wedding day timeline" hint="Baraat, varmala, pheras — what happens when." acc="#FFC46B">
+        {data.timeline.map((ev, i) => (
+          <div className="wf-block" key={i}>
+            <div className="wf-row2">
+              <F label={`Item ${i + 1}`}><input value={ev.title} onChange={(e) => upArr("timeline", i, "title", e.target.value)} /></F>
+              <F label="When"><input value={ev.when} onChange={(e) => upArr("timeline", i, "when", e.target.value)} placeholder="6 Dec 2026, 7:00 PM" /></F>
+            </div>
+            <F label="Note"><input value={ev.desc} onChange={(e) => upArr("timeline", i, "desc", e.target.value)} /></F>
+          </div>
+        ))}
+
+      </Card>
+
+      <Card icon={MapPin} title="Venue" hint="Add a Google Maps link and guests get one-tap directions." acc="#CFE3B2">
+        <F label="Venue name"><input value={data.venueName} onChange={(e) => up("venueName", e.target.value)} /></F>
+        <F label="Address"><input value={data.venueAddress} onChange={(e) => up("venueAddress", e.target.value)} /></F>
+        <F label="Google Maps link"><input value={data.mapsUrl} onChange={(e) => up("mapsUrl", e.target.value)} placeholder="https://maps.google.com/?q=…" /></F>
+
+      </Card>
+
+      <Card icon={Shirt} title="Dress code" acc="#F9C6D6">
+        <F label="Women"><input value={data.dressWomen} onChange={(e) => up("dressWomen", e.target.value)} /></F>
+        <F label="Men"><input value={data.dressMen} onChange={(e) => up("dressMen", e.target.value)} /></F>
+
+      </Card>
+
+      <Card icon={Sparkles} title="Pre-wedding functions" hint="Haldi, mehendi, sangeet — each with its own time and place." acc="#FFE27A">
+        {data.preEvents.map((ev, i) => (
+          <div className="wf-block" key={i}>
+            <div className="wf-row2">
+              <F label={`Event ${i + 1}`}><input value={ev.title} onChange={(e) => upArr("preEvents", i, "title", e.target.value)} /></F>
+              <F label="When"><input value={ev.when} onChange={(e) => upArr("preEvents", i, "when", e.target.value)} placeholder="4 Dec 2026, 8:00 PM" /></F>
+            </div>
+            <F label="Where"><input value={ev.where} onChange={(e) => upArr("preEvents", i, "where", e.target.value)} /></F>
+          </div>
+        ))}
+
+      </Card>
+
+      <Card icon={Car} title="For your guests" hint="Travel, stay, gifts and your closing line." acc="#D9D2F2">
+        <F label="Transportation"><textarea rows={2} value={data.transport} onChange={(e) => up("transport", e.target.value)} /></F>
+        <F label="Accommodation"><textarea rows={2} value={data.accommodation} onChange={(e) => up("accommodation", e.target.value)} /></F>
+        <F label="Gifts note"><textarea rows={2} value={data.giftsNote} onChange={(e) => up("giftsNote", e.target.value)} /></F>
+        <F label="Closing line"><input value={data.closing} onChange={(e) => up("closing", e.target.value)} /></F>
+
+      </Card>
+
+      <Card icon={LayoutGrid} title="What to show" hint="Tap to switch sections on or off. Empty sections hide themselves." acc="#F5A524">
+        <div className="wf-toggles">
+          {Object.entries(SECTION_LABELS).map(([k, label]) => (
+            <button type="button" key={k} className={`wf-toggle ${data.show[k] ? "on" : ""}`} onClick={() => upShow(k)}>
+              {data.show[k] && <Check size={13} />} {label}
+            </button>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }
