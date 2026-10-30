@@ -122,6 +122,8 @@ body:has(.fx) { background: #FFF8EC; }
 }
 .fx .wf-toggle:hover { transform: translateY(-2px); }
 .fx .wf-toggle.on { background: var(--haldi); color: var(--ink); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.fx .wf-remove { color: var(--sindoor); font: 700 13px var(--f-body), sans-serif; }
+.fx .wf-remove:hover { color: var(--ink); }
 
 /* style picker */
 .wf-styles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }

@@ -95,6 +95,13 @@ button { font-family: inherit; }
   color: var(--muted); padding: 8px 14px; border-radius: 20px; font: 500 13px "Jost", sans-serif; cursor: pointer;
 }
 .wf-toggle.on { background: var(--gold); color: #1c1607; border-color: var(--gold); }
+/* add / remove rows (story chapters, contacts) */
+.wf-add { align-self: flex-start; }
+.wf-remove {
+  align-self: flex-end; display: inline-flex; align-items: center; gap: 4px; background: none; border: 0;
+  color: var(--muted); font: 500 12.5px "Jost", sans-serif; cursor: pointer; padding: 2px 0;
+}
+.wf-remove:hover { color: var(--ivory); }
 
 .ed-actions {
   position: sticky; bottom: 0; margin-top: 26px; padding: 14px 0;

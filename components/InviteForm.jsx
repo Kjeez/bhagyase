@@ -1,6 +1,9 @@
 "use client";
 
-import { Check, Heart, CalendarHeart, Camera, Clock, MapPin, Shirt, Sparkles, Car, LayoutGrid, Palette, ExternalLink } from "lucide-react";
+import {
+  Check, Heart, CalendarHeart, Camera, Clock, MapPin, Shirt, Sparkles, Car, LayoutGrid, Palette, ExternalLink,
+  BookHeart, Users, Phone, Plus, X,
+} from "lucide-react";
 import { TEMPLATES } from "@/lib/templates";
 
 function F({ label, children }) {
@@ -28,6 +31,13 @@ function Card({ icon: Icon, title, hint, acc, children }) {
   );
 }
 
+const TRADITIONS = [
+  ["hindu", "Hindu — Ganesh shloka"],
+  ["sikh", "Sikh — Ik Onkar, Gurbani & Punjabi lines"],
+  ["both", "Both — shloka, Gurbani & Punjabi lines"],
+  ["none", "None — no religious text"],
+];
+
 const SECTION_LABELS = {
   scratch: "Scratch card",
   slideshow: "Photos",
@@ -46,6 +56,9 @@ export default function InviteForm({ data, setData }) {
   const upArr = (arr, i, k, v) =>
     setData((d) => ({ ...d, [arr]: d[arr].map((e, j) => (j === i ? { ...e, [k]: v } : e)) }));
   const upShow = (k) => setData((d) => ({ ...d, show: { ...d.show, [k]: !d.show[k] } }));
+  const addRow = (arr, row) => setData((d) => ({ ...d, [arr]: [...d[arr], row] }));
+  const dropRow = (arr, i) => setData((d) => ({ ...d, [arr]: d[arr].filter((_, j) => j !== i) }));
+  const upFamily = (k, v) => setData((d) => ({ ...d, family: { ...d.family, [k]: v } }));
 
   return (
     <div className="wf">
@@ -80,10 +93,6 @@ export default function InviteForm({ data, setData }) {
           <F label="Bride extra line 1"><input value={data.brideLine1} onChange={(e) => up("brideLine1", e.target.value)} placeholder="(optional)" /></F>
           <F label="Bride extra line 2"><input value={data.brideLine2} onChange={(e) => up("brideLine2", e.target.value)} placeholder="(optional)" /></F>
         </div>
-        <F label="Your story (optional — shown in Royal Palace)">
-          <textarea rows={3} value={data.story} onChange={(e) => up("story", e.target.value)}
-            placeholder="How you met, your first trip, the proposal… Leave a blank line between paragraphs." />
-        </F>
       </Card>
 
       <Card icon={CalendarHeart} title="The big day" hint="Your countdown and scratch card use this date." acc="#FFD54A">
@@ -93,6 +102,15 @@ export default function InviteForm({ data, setData }) {
         <F label="Wedding date & time *">
           <input type="datetime-local" value={data.dateISO} onChange={(e) => up("dateISO", e.target.value)} />
         </F>
+        <F label="Blessings & tradition (Royal Palace)">
+          <select value={data.tradition} onChange={(e) => up("tradition", e.target.value)}>
+            {TRADITIONS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
+          </select>
+        </F>
+        <div className="wf-row2">
+          <F label="Tagline (optional)"><input value={data.tagline} onChange={(e) => up("tagline", e.target.value)} placeholder="From a Delhi school to forever" /></F>
+          <F label="Places (optional)"><input value={data.places} onChange={(e) => up("places", e.target.value)} placeholder="Himachal · Delhi · Punjab" /></F>
+        </div>
       </Card>
 
       <Card icon={Camera} title="Photos & music" hint="Optional — paste links to your photos and a song." acc="#BFE4DF">
@@ -108,6 +126,31 @@ export default function InviteForm({ data, setData }) {
           <input value={data.musicUrl} onChange={(e) => up("musicUrl", e.target.value)} placeholder="https://…mp3" />
         </F>
 
+      </Card>
+
+      <Card icon={BookHeart} title="Your story" hint="Optional — shown in Royal Palace. Write up to four chapters, or just a few paragraphs." acc="#F7B7A3">
+        <div className="wf-row2">
+          <F label="Story heading"><input value={data.storyIntro} onChange={(e) => up("storyIntro", e.target.value)} placeholder="Ek Punjabi Munda, Ek Pahadi Kudi" /></F>
+          <F label="Story sub-line"><input value={data.storyIntroSub} onChange={(e) => up("storyIntroSub", e.target.value)} placeholder="and one Delhi school" /></F>
+        </div>
+        {data.storyChapters.map((c, i) => (
+          <div className="wf-block" key={i}>
+            <F label={`Chapter ${i + 1} — title`}><input value={c.title} onChange={(e) => upArr("storyChapters", i, "title", e.target.value)} placeholder="Where it all began" /></F>
+            <F label="Text"><textarea rows={3} value={c.text} onChange={(e) => upArr("storyChapters", i, "text", e.target.value)} /></F>
+            <button type="button" className="wf-remove" onClick={() => dropRow("storyChapters", i)}><X size={13} /> Remove chapter</button>
+          </div>
+        ))}
+        {data.storyChapters.length < 4 && (
+          <button type="button" className="wf-toggle wf-add" onClick={() => addRow("storyChapters", { title: "", text: "" })}>
+            <Plus size={13} /> Add a chapter
+          </button>
+        )}
+        {!data.storyChapters.some((c) => c.text?.trim()) && (
+          <F label="Or just write it">
+            <textarea rows={3} value={data.story} onChange={(e) => up("story", e.target.value)}
+              placeholder="How you met, your first trip, the proposal… Leave a blank line between paragraphs." />
+          </F>
+        )}
       </Card>
 
       <Card icon={Clock} title="Wedding day timeline" hint="Baraat, varmala, pheras — what happens when." acc="#FFC46B">
@@ -128,6 +171,13 @@ export default function InviteForm({ data, setData }) {
         <F label="Address"><input value={data.venueAddress} onChange={(e) => up("venueAddress", e.target.value)} /></F>
         <F label="Google Maps link"><input value={data.mapsUrl} onChange={(e) => up("mapsUrl", e.target.value)} placeholder="https://maps.google.com/?q=…" /></F>
 
+      </Card>
+
+      <Card icon={Users} title="With love & blessings" hint="Optional — family names in Royal Palace. One couple per line; empty rows hide." acc="#FFD54A">
+        <F label="Grandparents"><textarea rows={2} value={data.family.grandparents} onChange={(e) => upFamily("grandparents", e.target.value)} placeholder="Smt. Kamla & Sh. Om Prakash Sharma" /></F>
+        <F label="Parents"><textarea rows={2} value={data.family.parents} onChange={(e) => upFamily("parents", e.target.value)} placeholder="Neelam & Vikram Sharma" /></F>
+        <F label="Family & relatives"><textarea rows={2} value={data.family.relatives} onChange={(e) => upFamily("relatives", e.target.value)} placeholder="Sharma & Kapoor Parivar" /></F>
+        <F label="With best compliments"><textarea rows={2} value={data.family.compliments} onChange={(e) => upFamily("compliments", e.target.value)} placeholder="All Near & Dear Ones" /></F>
       </Card>
 
       <Card icon={Shirt} title="Dress code" acc="#F9C6D6">
@@ -155,6 +205,23 @@ export default function InviteForm({ data, setData }) {
         <F label="Gifts note"><textarea rows={2} value={data.giftsNote} onChange={(e) => up("giftsNote", e.target.value)} /></F>
         <F label="Closing line"><input value={data.closing} onChange={(e) => up("closing", e.target.value)} /></F>
 
+      </Card>
+
+      <Card icon={Phone} title="Contact numbers" hint="Optional — guests can tap to call (Royal Palace)." acc="#BFE4DF">
+        {data.contacts.map((c, i) => (
+          <div className="wf-block" key={i}>
+            <div className="wf-row2">
+              <F label={`Contact ${i + 1} — name`}><input value={c.name} onChange={(e) => upArr("contacts", i, "name", e.target.value)} /></F>
+              <F label="Phone"><input type="tel" value={c.phone} onChange={(e) => upArr("contacts", i, "phone", e.target.value)} placeholder="+91 98xxx xxxxx" /></F>
+            </div>
+            <button type="button" className="wf-remove" onClick={() => dropRow("contacts", i)}><X size={13} /> Remove</button>
+          </div>
+        ))}
+        {data.contacts.length < 3 && (
+          <button type="button" className="wf-toggle wf-add" onClick={() => addRow("contacts", { name: "", phone: "" })}>
+            <Plus size={13} /> Add a contact
+          </button>
+        )}
       </Card>
 
       <Card icon={LayoutGrid} title="What to show" hint="Tap to switch sections on or off. Empty sections hide themselves." acc="#F5A524">
