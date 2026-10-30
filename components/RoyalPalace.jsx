@@ -319,17 +319,6 @@ function Lotus({ className = "" }) {
   );
 }
 
-function Dove({ className }) {
-  return (
-    <svg className={`dove ${className}`} viewBox="-40 -32 80 52" aria-hidden="true">
-      <path className="dove-wing dove-wing-far" d="M6 2C2-10-6-22-18-30C-6-29 8-19 16-2Z" />
-      <path d="M-30 6C-22 2-10 0 2 2C10 3 16 0 22-4C25-6 29-6 31-3C32-1 34 0 37 0C34 2 31 3 29 5C24 11 12 14 0 13C-10 12-20 10-26 12L-37 17C-35 12-33 9-30 6Z" fill="#fdfbff" />
-      <path className="dove-wing" d="M2 4C-2-8-12-21-30-28C-12-28 6-17 14 2Z" />
-      <circle cx="27" cy="-3" r="0.9" fill="#3a2a40" />
-    </svg>
-  );
-}
-
 const PETALS = (() => {
   const r = rng(42);
   return Array.from({ length: 16 }, () => ({
@@ -340,22 +329,6 @@ const PETALS = (() => {
     tone: r() > 0.45 ? "red" : "white",
   }));
 })();
-
-function Petals() {
-  return (
-    <div className="petals" aria-hidden="true">
-      {PETALS.map((p, i) => (
-        <span
-          key={i}
-          className={`petal petal-${p.tone}`}
-          style={{ "--x": `${p.x}%`, "--d": `${p.d}s`, "--delay": `${p.delay}s`, "--s": p.s }}
-        >
-          <i />
-        </span>
-      ))}
-    </div>
-  );
-}
 
 const SPARKS = (() => {
   const r = rng(77);
@@ -414,6 +387,93 @@ function Flourish() {
 /* =========================================================
    Wax seal
    ========================================================= */
+/* Gold line-art Ganesha that draws itself in above the blessing */
+const GANESHA = [
+  "M44 40C44 26 52 18 60 12C68 18 76 26 76 40",
+  "M42 40H78M44 34H76",
+  "M60 12V6",
+  "M42 40C38 52 40 64 48 70M78 40C82 52 80 64 72 70",
+  "M42 44C26 36 12 46 14 62C16 76 30 82 42 74",
+  "M38 50C28 48 22 56 24 64C26 70 32 72 38 68",
+  "M78 44C94 36 108 46 106 62C104 76 90 82 78 74",
+  "M82 50C92 48 98 56 96 64C94 70 88 72 82 68",
+  "M56 44C56 50 64 50 64 44M60 42V54",
+  "M48 57C51 54 55 54 57 57M63 57C65 54 69 54 72 57",
+  "M54 62C52 78 54 94 62 104C68 111 78 111 80 103C82 97 76 93 72 97",
+  "M66 62C66 76 66 88 70 96",
+  "M50 70C46 76 44 82 46 87M70 70C73 73 74 76 73 79",
+  "M24 118Q60 126 96 118M40 124Q60 129 80 124",
+];
+
+function Ganesha({ className = "" }) {
+  return (
+    <svg className={`ganesha ${className}`} viewBox="0 0 120 132" aria-hidden="true">
+      <defs>
+        <linearGradient id="ganesha-gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fbe7ae" />
+          <stop offset="0.55" stopColor="#e0b25c" />
+          <stop offset="1" stopColor="#b8862e" />
+        </linearGradient>
+      </defs>
+      {GANESHA.map((d, i) => (
+        <path key={i} d={d} pathLength="1" style={{ "--i": i }} />
+      ))}
+      <circle cx="60" cy="28" r="2.6" className="ganesha-gem" />
+      <circle cx="60" cy="4" r="2.4" className="ganesha-gem" />
+    </svg>
+  );
+}
+
+/* Carved gold arch (scalloped mehrab) that frames the names */
+const ARCH =
+  "M10 430V150A26 26 0 0 1 30 108A30 30 0 0 1 62 70A34 34 0 0 1 104 42A30 30 0 0 1 150 18" +
+  "A30 30 0 0 1 196 42A34 34 0 0 1 238 70A30 30 0 0 1 270 108A26 26 0 0 1 290 150V430";
+
+function HeroArch() {
+  return (
+    <svg className="hero-arch" viewBox="-10 -18 320 452" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+      <defs>
+        <linearGradient id="arch-gold" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fbe7ae" />
+          <stop offset="0.55" stopColor="#d4a24c" />
+          <stop offset="1" stopColor="#d4a24c" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={ARCH} pathLength="1" />
+      <path d={ARCH} pathLength="1" className="arch-inner" transform="translate(150 0) scale(.93 .96) translate(-150 22)" />
+      <path className="arch-finial" d="M150 18C145 10 145 2 150-8C155 2 155 10 150 18Z" />
+      <circle cx="150" cy="-12" r="2.4" className="arch-gem" />
+      <circle cx="10" cy="150" r="3.2" className="arch-gem" />
+      <circle cx="290" cy="150" r="3.2" className="arch-gem" />
+    </svg>
+  );
+}
+
+/* Slow golden embers rising through the night, like sparks from diyas */
+const EMBERS = (() => {
+  const r = rng(91);
+  return Array.from({ length: 16 }, () => ({
+    x: f(r() * 100),
+    d: f(14 + r() * 12),
+    delay: f(-r() * 20),
+    s: f(2 + r() * 3.5),
+    drift: f((r() - 0.5) * 40),
+  }));
+})();
+
+function Embers() {
+  return (
+    <div className="embers" aria-hidden="true">
+      {EMBERS.map((m, i) => (
+        <i
+          key={i}
+          style={{ "--x": `${m.x}%`, "--d": `${m.d}s`, "--delay": `${m.delay}s`, "--s": `${m.s}px`, "--drift": `${m.drift}px` }}
+        />
+      ))}
+    </div>
+  );
+}
+
 /* Gold laurel wreath that grows in behind the seal */
 const LAUREL = (() => {
   const R = 70;
@@ -901,12 +961,11 @@ export default function RoyalPalace({ data, slug, preview = false }) {
             <img className="hero-bg" src={`${IMG}/palace-night.jpg`} alt="" />
           </div>
           <div className="hero-shade" />
-          <Dove className="dove-1" />
-          <Dove className="dove-2" />
-          <Dove className="dove-3" />
-          <Petals />
+          <HeroArch />
+          <Embers />
           <div className="hero-copy-wrap">
             <div className="hero-copy">
+              <Ganesha className="hero-ganesh" />
               <p className="hero-kicker">॥ श्री गणेशाय नमः ॥</p>
               <p className="script hero-day">Wedding Day</p>
               <p className="hero-date">

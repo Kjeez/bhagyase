@@ -523,43 +523,6 @@ html.rx-locked body {
   color: #f1e3c9;
 }
 
-/* Doves */
-.rx .dove {
-  position: absolute;
-  width: 46px;
-  z-index: 1;
-  opacity: 0;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 30, 0.35));
-}
-.rx.revealed .dove {
-  opacity: 1;
-  animation: rx-fly var(--fly, 16s) linear var(--fly-delay, 0s) infinite;
-}
-.rx .dove-1 { top: 30%; --fly: 15s; --fly-delay: 0.6s; }
-.rx .dove-2 { top: 36%; width: 34px; --fly: 19s; --fly-delay: 2.2s; }
-.rx .dove-3 { top: 25%; width: 28px; --fly: 22s; --fly-delay: 7s; }
-.rx .dove-wing {
-  fill: #f3f0fb;
-  transform-box: fill-box;
-  transform-origin: 80% 100%;
-  animation: rx-flap 0.55s ease-in-out infinite alternate;
-}
-.rx .dove-wing-far {
-  fill: #d8d2ea;
-  animation-delay: -0.08s;
-}
-@keyframes rx-flap {
-  from { transform: scaleY(1); }
-  to { transform: scaleY(-0.45); }
-}
-@keyframes rx-fly {
-  0% { transform: translate(-70px, 30px); }
-  25% { transform: translate(110px, 0); }
-  50% { transform: translate(250px, 18px); }
-  75% { transform: translate(390px, -8px); }
-  100% { transform: translate(540px, 6px); }
-}
-
 /* Petals */
 .rx .petals {
   position: absolute;
@@ -1202,10 +1165,9 @@ html.rx-locked body {
 .rx .env-light::before {
     animation: none !important;
   }
-  .rx .env-sprig { opacity: 0.2; }
+  .rx .env-sprig { opacity: 0.9; }
   .rx .env-sprig path { stroke-dashoffset: 0; }
-  .rx .petals:not(.petals-burst),
-.rx .dove {
+  .rx .petals:not(.petals-burst) {
     display: none;
   }
   .rx .hero-bg {
@@ -1932,4 +1894,115 @@ body:has(.rx) { background: #1a0710; }
   .rx .laurel-stem { animation: none; stroke-dashoffset: 0; }
   .rx .laurel-leaf { animation: none; opacity: 1; }
   .rx .env-hint .script { animation: none; }
+}
+
+/* ---------- classic hero: Ganesha, carved arch, golden embers ---------- */
+.rx .ganesha {
+  display: block;
+  width: 62px;
+  margin: 0 auto 4px;
+  overflow: visible;
+  filter: drop-shadow(0 0 6px rgba(246, 214, 150, 0.55));
+}
+.rx .ganesha path {
+  fill: none;
+  stroke: url(#ganesha-gold);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1.6s cubic-bezier(0.5, 0.1, 0.3, 1) calc(0.3s + var(--i) * 0.07s);
+}
+.rx .ganesha-gem {
+  fill: #f6dfa2;
+  opacity: 0;
+  transition: opacity 0.8s ease 1.6s;
+}
+.rx.revealed .ganesha path {
+  stroke-dashoffset: 0;
+}
+.rx.revealed .ganesha-gem {
+  opacity: 1;
+}
+.rx .hero-arch {
+  position: absolute;
+  left: 16px;
+  top: -6px;
+  width: calc(100% - 32px);
+  height: 74%;
+  z-index: 1;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px rgba(246, 214, 150, 0.45));
+}
+.rx .hero-arch path {
+  fill: none;
+  stroke: url(#arch-gold);
+  stroke-width: 1.4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 2.4s cubic-bezier(0.5, 0.1, 0.3, 1) 0.6s;
+}
+.rx .hero-arch .arch-inner {
+  stroke-width: 0.8;
+  opacity: 0.7;
+  transition-delay: 0.9s;
+}
+.rx .hero-arch .arch-finial {
+  stroke-dasharray: none;
+  stroke-dashoffset: 0;
+  fill: rgba(246, 214, 150, 0.25);
+  opacity: 0;
+  transition: opacity 1s ease 2.4s;
+}
+.rx .hero-arch .arch-gem {
+  fill: #f6dfa2;
+  opacity: 0;
+  transition: opacity 1s ease 2.6s;
+}
+.rx.revealed .hero-arch path {
+  stroke-dashoffset: 0;
+}
+.rx.revealed .hero-arch .arch-finial,
+.rx.revealed .hero-arch .arch-gem {
+  opacity: 1;
+}
+.rx .embers {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.rx .embers i {
+  position: absolute;
+  left: var(--x);
+  bottom: -10px;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3cf 0%, rgba(246, 214, 150, 0.85) 40%, rgba(246, 214, 150, 0) 72%);
+  opacity: 0;
+  animation: rx-ember var(--d) linear var(--delay) infinite;
+}
+@keyframes rx-ember {
+  0% { transform: translate(0, 0); opacity: 0; }
+  12% { opacity: 0.9; }
+  80% { opacity: 0.55; }
+  100% { transform: translate(var(--drift), -105vh); opacity: 0; }
+}
+/* RSVP celebration: gold leaf flakes instead of petals */
+.rx .petals-burst .petal i {
+  width: calc(9px * var(--s));
+  height: calc(9px * var(--s));
+  border-radius: 1px;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #fff3cf, #e0b25c 55%, #a8782a);
+  box-shadow: 0 0 6px rgba(255, 210, 130, 0.6);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rx .embers { display: none; }
+  .rx .ganesha path,
+  .rx .hero-arch path { transition: none; stroke-dashoffset: 0; }
 }
